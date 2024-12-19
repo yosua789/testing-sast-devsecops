@@ -12,7 +12,7 @@ RUN wget https://tar.goaccess.io/goaccess-1.7.tar.gz && \
 
 RUN goaccess --version
 
-RUN pip install --upgrade mongoengine blacksheep==1.2.18 uvicorn passlib pytz subprocess.run opencv-python python-dotenv requests PyYAML
+RUN pip install --upgrade mongoengine blacksheep==1.2.18 uvicorn passlib pytz subprocess.run opencv-python python-dotenv requests PyYAML APScheduler
 
 RUN useradd -rm -d /home/kecilin -s /bin/bash -u 1000 kecilin 
 
