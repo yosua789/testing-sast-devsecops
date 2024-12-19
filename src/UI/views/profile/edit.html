@@ -1,0 +1,125 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Edit Profile </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <form action="">
+                        <div class="mb-3">
+                            <label for="name" class="form-label"> Name</label>
+                            <input type="text" name="name" class="form-control" value={{user.name}} id="nameUpdate" placeholder=" Name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label"> Email</label>
+                            <input type="email" name="email" class="form-control" value="{{user.email}}" readonly id="emailUpdate" placeholder="Email">
+                        </div>
+                        <div class="form-check  ml-0 ps-0 mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="change_password">
+                            <label class="form-check-label" for="change_password">
+                                Change Password
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" name="current_password" class="form-control" disabled
+                                id="current_password" placeholder="Current Password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" name="new_password" class="form-control" id="new_password" disabled
+                                placeholder="New Password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" name="confirm_password" class="form-control" disabled
+                                id="confirm_password" placeholder="Confirm Password">
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button onclick="updateUser(event)" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+{%- endblock -%}
+
+{%- block extrajs -%}
+
+<script>
+    document.getElementById('change_password').addEventListener('click', event => {
+        if (event.target.checked) {
+            document.getElementById('current_password').disabled = false;
+            document.getElementById('new_password').disabled = false;
+            document.getElementById('confirm_password').disabled = false;
+        } else {
+            document.getElementById('current_password').disabled = true;
+            document.getElementById('new_password').disabled = true;
+            document.getElementById('confirm_password').disabled = true;
+        }
+    });
+
+    function updateUser(e){
+        e.preventDefault();
+
+        var name = $('#nameUpdate').val()
+        var email = $('#emailUpdate').val()
+        var cur_pass = $('#current_password').val()
+        var new_pass = $('#new_password').val()
+        var confim_pass = $('#confirm_password').val()
+        var triger =  document.getElementById("change_password");
+        
+        if (triger.checked){
+            $.post('/api/v1/userapi/update', {
+                username: name,
+                email: email,
+                current_password: cur_pass,
+                new_password: new_pass,
+                confirm_password:confim_pass,
+                }, function (res) {
+                    console.log(res)
+                    if (res.status == 200){
+                        alert(res.message)
+                        location.reload()
+                    }else{
+                        alert(res.message)
+                    }
+                })
+        }else{
+            $.post('/api/v1/userapi/update', {
+                username: name,
+                email: email,
+                }, function (res) {
+                    console.log(res)
+                    if (res.status == 200){
+                        alert(res.message)
+                        location.reload()
+                    }else{
+                        alert(res.message)
+                    }
+                })                
+        }
+        
+
+
+
+
+
+    }
+</script>
+
+
+{%- endblock -%}

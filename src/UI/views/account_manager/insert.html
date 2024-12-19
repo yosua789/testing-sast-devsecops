@@ -1,0 +1,114 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+<div class="container-fluid py-4">
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Add Role Data </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-2">
+                    <form action="/account-manager/add-data" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label"> Name</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder=" Name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label"> Email</label>
+                            <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" id="password"
+                                placeholder="Password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Choose Role</label>
+                            <select class="form-select form-control" aria-label="Default select example" name="role"
+                                id="role">
+                                <option selected disabled>Choose Role</option>
+                                <option value="2">Superadmin</option>
+                                <option value="1">Admin</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary">Add Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+{% if bs_message("success", check=True) %}
+<div class="modal fade" id="addSuccess" tabindex="-1" aria-labelledby="addSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addSuccessLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                    Success</h6>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <h1>
+                    <i class="far fa-check-circle text-success" style="font-size: 100px;"></i>
+                </h1>
+                {% for msg in bs_message("success") %}
+                <h6 class="text-center mb-3"> {{ msg }}</h6>
+                {% endfor %}
+                <div class="d-flex justify-content-center btn-modal mt-2">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if bs_message("error", check=True) %}
+<div class="modal fade addFailedModal" id="addFailed" tabindex="-1" aria-labelledby="addFailedLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addFailedLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                    Failed</h6>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <h1>
+                    <i class="far fa-times-circle text-danger" style="font-size: 100px;"></i>
+                </h1>
+                {% for msg in bs_message("error") %}
+                <h6 class="text-center mb-3">{{ msg }}</h6>
+                {% endfor %}
+                <div class="d-flex justify-content-center btn-modal mt-2">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{%- endblock -%}
+
+{%- block extrajs -%}
+<script>
+    var addSuccess = document.getElementById("addSuccess");
+    var addFailed = document.getElementById("addFailed");
+
+    if (addSuccess) {
+        var successModal = new bootstrap.Modal(document.getElementById("addSuccess"), {});
+        successModal.show();
+    }
+
+    if (addFailed) {
+        var failModal = new bootstrap.Modal(document.getElementById("addFailed"), {});
+        failModal.show();
+    }
+</script>
+{%- endblock -%}

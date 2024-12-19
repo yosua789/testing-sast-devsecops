@@ -1,0 +1,147 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-9 col-9">
+                            <h6>Change Compression Setting</h6>
+                        </div>
+                        <div class="col-lg-3 col-3">
+                            <div class="float-right">
+                                <div class="bg-gray-200 p-2 rounded">
+                                    <p class="text-center text-xs mb-0">
+                                        Information : Changes will be saved if you have
+                                        pressed the <span class="font-weight-bold">update setting button</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-2">
+                    <form>
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-secondary text-sm font-weight-bolder opacity-7">CCTV
+                                            Name
+                                        </th>
+                                        <th
+                                            class="text-secondary text-center text-sm font-weight-bolder opacity-7 ps-2">
+                                            Level Compression <small class="font-weight-lighter">(25-35)</small>
+                                        </th>
+                                        <th
+                                            class="text-secondary text-center  text-sm font-weight-bolder opacity-7 ps-2">
+                                            Custom Endpoint <small class="font-weight-lighter">(Optional)
+                                            </small>
+                                        </th>
+                                        <th
+                                            class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">
+                                            Output Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {% for i in cctv %}
+                                    <tr>
+                                        <input type="hidden" value="{{i.id}}" name="id[]">
+                                        <td>
+                                            <div class=" d-flex px-3 py-1">
+                                                <h6 class="mb-0 text-sm fw-normal">{{i.name}}</h6>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex px-3 py-1 justify-content-center">
+                                                <input type="text" class="form-control border px-2 w-25"
+                                                    id="level" name="level[]" placeholder="Level Compression"
+                                                    value="35">
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            <div class="d-flex px-3 py-1 justify-content-center">
+                                                <input type="text" class="form-control border px-2 w-75"
+                                                    id="level" name="endpoint[]" placeholder="Endpoint" value="-">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex px-3 py-1 justify-content-center">
+                                                <select class="form-select form-control" name="output[]"
+                                                    id="output_type">
+                                                    <option disabled>Choose Type</option>
+                                                    <option selected value="RTSP">RSTP</option>
+                                                    <option value="RTMP">RTMP</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {%endfor%}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-2 me-4">
+                            <button class="btn btn-primary text-white"  onclick="test(event)" type="submit">Update Setting</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</main>
+
+{%- endblock -%}
+{%- block extrajs -%}
+
+<script>
+
+    function simpleVar(data){
+        var output = []
+
+        $.each(data,function(key,value){
+            if (value.value == ""){
+                value.value = "EmptyContent123!!123"
+            }
+            output.push(value.value)
+        })
+
+        return output
+
+    }
+
+    function test(e){
+        e.preventDefault();
+        // var a = $('form').serializeArray()
+        var id = $('input[name="id[]"]').serializeArray();
+        var level = $('input[name="level[]"]').serializeArray();
+        var endpoint = $('input[name="endpoint[]"]').serializeArray();
+        var output = $('select[name="output[]"]').serializeArray();
+        
+        id = simpleVar(id)
+        level = simpleVar(level)
+        endpoint = simpleVar(endpoint)
+        output = simpleVar(output)
+
+        
+
+        // $.post('/compression/change-setting',{id : id,level : level,endpoint : endpoint,output : output},function(e){
+        //     console.log(e)
+        // })
+        $.each(id,function(key,value){
+            console.log(id[key])
+
+            $.post('/api/v1/compression/update-compression-cctv',{id : id[key],compression : level[key],custome : endpoint[key],type : output[key]},function(res){
+                console.log(res)
+            })
+        })
+    }
+
+</script>
+{%- endblock -%}

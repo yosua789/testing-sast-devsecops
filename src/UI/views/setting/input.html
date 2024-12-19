@@ -1,0 +1,132 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+<div class="container-fluid py-4">
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Update Input Option</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4 pb-2">
+                    <form>
+                        <div class="mb-3">
+                            <label for="cctvName" class="form-label">Enable Input Options</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableRec" 
+                                {%if rec_json.input.enable == 1 %} checked {%endif%}>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rtspLink" class="form-label">Input Options</label>
+                            <input type="text" name="link" value="{{rec_json.input.out_opt}}" class="form-control" id="optIn" placeholder="Input Options">
+                        </div>
+                        <div class="mb-3">
+                            <small class=""></small>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary" onclick="sendUpdate(event)">Add Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+{% if bs_message("success", check=True) %}
+<div class="modal fade" id="addSuccess" tabindex="-1" aria-labelledby="addSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addSuccessLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                    Success</h6>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <h1>
+                    <i class="far fa-check-circle text-success" style="font-size: 100px;"></i>
+                </h1>
+                {% for msg in bs_message("success") %}
+                <h6 class="text-center mb-3"> {{ msg }}</h6>
+                {% endfor %}
+                <div class="d-flex justify-content-center btn-modal mt-2">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if bs_message("error", check=True) %}
+<div class="modal fade addFailedModal" id="addFailed" tabindex="-1" aria-labelledby="addFailedLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addFailedLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                    Failed</h6>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <h1>
+                    <i class="far fa-times-circle text-danger" style="font-size: 100px;"></i>
+                </h1>
+                {% for msg in bs_message("error") %}
+                <h6 class="text-center mb-3">{{ msg }}</h6>
+                {% endfor %}
+                <div class="d-flex justify-content-center btn-modal mt-2">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{%- endblock -%}
+{%- block extrajs -%}
+<script>
+    // var addSuccess = document.getElementById("addSuccess");
+    // var addFailed = document.getElementById("addFailed");
+
+    // if (addSuccess) {
+    //     var successModal = new bootstrap.Modal(document.getElementById("addSuccess"), {});
+    //     successModal.show();
+    // }
+
+    // if (addFailed) {
+    //     var failModal = new bootstrap.Modal(document.getElementById("addFailed"), {});
+    //     failModal.show();
+    // }
+
+    function sendUpdate(e){
+        e.preventDefault()
+        
+        var opt = $('#optIn').val()
+        var enableBox = document.getElementById('enableRec')
+        var enable = 0
+
+        if (enableBox.checked){
+            enable = 1
+        }
+        url = '/api/v1/task/update-config-input'
+        $.post(url,{enable:enable,options:opt},function(res){
+            if(res.status == 200){
+                alert(res.message)
+                location.reload()
+            }else{
+                alert(res.message)
+            }
+        })
+
+
+        
+
+    }
+</script>
+{%- endblock -%}

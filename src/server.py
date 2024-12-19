@@ -1,0 +1,1 @@
+from kecilin_web import app

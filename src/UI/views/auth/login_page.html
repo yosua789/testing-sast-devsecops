@@ -1,0 +1,193 @@
+<!--
+=========================================================
+* Material Dashboard 2 - v3.0.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2021 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <title>
+    Kecilin Compression Setting
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.0" rel="stylesheet" />
+  <link id="pagestyle" href="/css/style.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-200">
+  <main class="main-content  mt-0">
+    <div class="page-header align-items-start min-vh-100"
+      style="background-image: url('/img/login-banner.png');">
+      <span class="mask bg-gradient-dark opacity-6"></span>
+      <div class="container my-auto">
+        <div class="row">
+          <div class="col-lg-4 col-md-8 col-12 mx-auto">
+            <div class="card z-index-0 fadeIn3 fadeInBottom">
+              <div class="card-header p-0 position-relative mt-n4 mx-5 z-index-2">
+                <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+                  <div class="d-flex p-4 px-5">
+                    <img src="/img/logo.svg" class="navbar-brand-img" width="50px" alt="main_logo">
+                    <div class="mt-3">
+                      <h3 class="ms-2 font-weight-bold text-white" style="line-height: 10px;">Kecilin</h3>
+                      <span class="ms-2 text-white text-md"> Compression Setting</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h6 class="text-center">Enter your email and password</h6>
+                <div>
+                  <div class="input-group input-group-outline my-3">
+                    <label class="form-label">Email</label>
+                    <input type="text" name="email" id="email" class="form-control">
+                  </div>
+                  <div class="input-group input-group-outline mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" id="password" class="form-control">
+                  </div>
+           
+                     <div class="text-center">
+                    <button class="btn bg-gradient-primary  w-100 my-4 mb-2" id="LoginBtn">Login</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="ModalSuccess" tabindex="-1" aria-labelledby="addSuccessLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6 class="modal-title" id="addSuccessLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                      Success</h6>
+              </div>
+              <div class="modal-body p-5 text-center">
+                  <h1>
+                      <i class="far fa-check-circle text-success" style="font-size: 100px;"></i>
+                  </h1>
+                  <h6 class="text-center mb-3" id="modal_message_success"></h6>
+
+                  <div class="d-flex justify-content-center btn-modal mt-2">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+    <div class="modal fade addFailedModal" id="ModalFailed" tabindex="-1" aria-labelledby="addFailedLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6 class="modal-title" id="addFailedLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                      Failed</h6>
+              </div>
+              <div class="modal-body p-5 text-center">
+                  <h1>
+                      <i class="far fa-times-circle text-danger" style="font-size: 100px;"></i>
+                  </h1>
+                  
+                  <h6 class="text-center mb-3" id="modal_message_failed"></h6>
+                  
+                  <div class="d-flex justify-content-center btn-modal mt-2">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  </main>
+  <script src="/js/jquery-3.6.3.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      $("#LoginBtn").click(function () {
+        var email = $('#email').val()
+        var pass = $('#password').val()
+
+        var postData = new FormData()
+        postData.append("email",email);
+        postData.append("password",pass);
+
+        $.ajax({
+            url: '/auth/login', // Replace with your API endpoint
+            type: 'POST',
+            data: postData,
+            processData: false, // Prevent jQuery from automatically processing the data
+            contentType: false, // Let the server handle the Content-Type
+            success: function (response) {
+                if (response.status == 200) {
+                    $("#ModalSuccess").modal('show')
+                    $("#modal_message_success").text(response.message)
+
+                    $('#ModalSuccess').on('hidden.bs.modal', function() {
+                        window.location.href = "/dashboard";
+                      });
+                } else {
+                    $("#ModalFailed").modal('show')
+                    $("#modal_message_failed").text(response.message)
+
+                    $('#ModalFailed').on('hidden.bs.modal', function() {
+                        location.reload()
+                      });
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error response
+                console.error(error);
+            }
+        });
+
+
+      });
+    });
+  </script>
+  <!--   Core JS Files   -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="/js/material-dashboard.min.js?v=3.0.0"></script>
+  
+</body>
+
+</html>

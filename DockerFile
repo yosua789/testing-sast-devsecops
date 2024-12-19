@@ -1,0 +1,28 @@
+FROM python:3.10
+
+RUN apt-get update
+RUN apt install wget  curl libgl1-mesa-glx iputils-ping -y
+
+RUN wget https://tar.goaccess.io/goaccess-1.7.tar.gz && \
+    tar -xzvf goaccess-1.7.tar.gz && \
+    cd goaccess-1.7 && \
+    ./configure --enable-utf8 --enable-geoip=mmdb && \
+    make && make install && \
+    cd .. && rm -rf goaccess-1.7*
+
+RUN goaccess --version
+
+RUN pip install --upgrade mongoengine blacksheep==1.2.18 uvicorn passlib pytz subprocess.run opencv-python python-dotenv requests PyYAML
+
+RUN useradd -rm -d /home/kecilin -s /bin/bash -u 1000 kecilin 
+
+USER kecilin
+
+WORKDIR /home/kecilin/src
+
+CMD [ "uvicorn", "server:app", "--host", "0.0.0.0", "--reload"]
+
+
+
+
+

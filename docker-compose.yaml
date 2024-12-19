@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  dasboard:
+    container_name: kecilin_web_logger
+    build: 
+      context: .
+      dockerfile: DockerFile
+    volumes:
+      - ./src:/home/kecilin/src
+      - /home/gozilla/project/web_logger/log:/home/log
+    ports:
+      - 50001:8000
+
+  mongodb:
+    container_name: kecilin_mongo_db
+    image: mongo:4.4
+    ports:
+      - 50002:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=kecilin
+      - MONGO_INITDB_ROOT_PASSWORD=kecilinmongodb123kecilin
+      - MONGO_INITDB_DATABASE=development
+
+
