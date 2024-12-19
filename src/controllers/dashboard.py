@@ -18,16 +18,26 @@ class Dashboard(BaseController):
     # @auth()
     @get("/")
     def index(self):
-        a = GoaccessEngine()
-        
-        sts,msg = a.exe("/home/log/access.log")
+        x = MetaModel.objects.all()
 
-        print(f"{sts} - {msg}")
+        if not x:
+            return "empty"
 
 
         # exe = LogModel(filename="access.log")
         # exe.save()
 
-        return "hai"
+        return len(x)
+    
+    @get("add-data")
+    def add(self):
+        cek = LogModel.objects.filter(filename="access.log").first()
 
+        if cek:
+          return "already add"
+
+        a = LogModel(filename="access.log",lastsize=0)
+        a.save()
+
+        return "success"  
 
