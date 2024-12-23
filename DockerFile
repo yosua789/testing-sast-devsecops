@@ -16,7 +16,7 @@ RUN pip install --upgrade mongoengine blacksheep==1.2.18 uvicorn passlib pytz su
 
 RUN useradd -rm -d /home/kecilin -s /bin/bash -u 1000 kecilin 
 
-USER kecilin
+USER root
 
 WORKDIR /home/kecilin/src
 

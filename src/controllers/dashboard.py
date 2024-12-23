@@ -42,8 +42,10 @@ class Dashboard(BaseController):
         if cek:
           return "already add"
 
-        a = LogModel(filename="/test2/access.log",lastsize=0)
+        a = LogModel(filename="/test/access.log",lastsize=0)
         a.save()
 
+        b = LogModel(filename="/test2/access.log",lastsize=0)
+        b.save()
         return "success"  
 

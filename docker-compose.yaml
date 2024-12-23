@@ -8,7 +8,7 @@ services:
       dockerfile: DockerFile
     volumes:
       - ./src:/home/kecilin/src
-      - /home/gozilla/project/web_logger/log:/home/log/test1
+      - /home/gozilla/project/web_logger/log:/home/log/test
       - /home/gozilla/project/web_logger/log_2:/home/log/test2
 
     ports:
