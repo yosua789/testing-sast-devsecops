@@ -28,6 +28,16 @@ class GoaccessEngine():
         
         return True,res.stdout.strip()
     
+    def filenameRespone(self,filename):
+
+        respone_path = os.path.splitext(filename)[0].split("/")[-2]
+        respone_path = os.path.join(self.respone_path,respone_path)
+
+        respone_file = os.path.splitext(filename)[0].split("/")[-1] + ".json"
+        respone_file = os.path.join(respone_path,respone_file)
+
+        return respone_file,respone_path
+
 
     def exe(self,filename,ignore_setting=True):
         status,goacc = self.getGoaccess()
@@ -50,10 +60,11 @@ class GoaccessEngine():
             except Exception as e:
                 pass
 
-        respone_file = os.path.splitext(filename)[0].split("/")[-1] + ".json"
-        respone_file = os.path.join(self.respone_path,respone_file)
 
-        print(respone_file)
+        respone_file,respone_path = self.filenameRespone(filename)
+
+        if not os.path.exists(respone_path):
+            os.mkdir(respone_path)
                 
         command = [
             goacc,
@@ -65,8 +76,6 @@ class GoaccessEngine():
             "-o",
             respone_file
         ]
-
-        print(command)
 
         try:
             exe = subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
@@ -112,8 +121,11 @@ class GoaccessEngine():
             return False
         
         for log in cekLog:
-            file = os.path.join(self.log_path,log.filename)
+            file = log.filename.lstrip("/")
+            file = os.path.join(self.log_path,file)
             size = os.path.getsize(file)
+
+            print(file)
 
             if size != log.lastsize:
 
@@ -121,8 +133,9 @@ class GoaccessEngine():
                 if status:
 
                     print(f"Read log {file} Success")
-                    respone_file = os.path.splitext(log.filename)[0].split("/")[-1] + ".json"
-                    respone_file = os.path.join(self.respone_path,respone_file)
+                    respone_file,respone_path = self.filenameRespone(log.filename)
+                    print(respone_file)
+                    
 
                     with open(respone_file,"r") as file:
                         go_json = json.load(file)
@@ -135,6 +148,7 @@ class GoaccessEngine():
 
                 else:
                     print(f"Read log {file} Failed with error: {msg}")
+                    return False
 
         return True
 

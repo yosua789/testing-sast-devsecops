@@ -7,7 +7,9 @@ This project is used to read logs from webservers such as (nginx, apache)
 For installatio u can run : 
 
 
-but first u must change volumes dir to location where log is set
+but first u must change volumes dir to location where log is set, keep in mind that u can use multiple path to mouthing path, but u must make path in /home/log or in your log path in env 
+
+example : /home/log/test
 
 ```code
     services:
@@ -18,12 +20,12 @@ but first u must change volumes dir to location where log is set
       dockerfile: DockerFile
     volumes:
       - ./src:/home/kecilin/src
-      - /home/gozilla/project/web_logger/log:/home/log # here change 
+      - /home/gozilla/project/web_logger/log:/home/log/rest # change here 
     ports:
       - 50001:8000
 ```
 
-after change, u can run 
+after change the path to mouthing, u can run 
 
 ```bash
 sudo docker-compose up --build
@@ -34,16 +36,6 @@ needed :
 uniq user, req file,not found,os,browesr,reffering site
 
 
-command for dev :
-
-```bash
-goaccess access.log \
---log-format='%h %^[%d:%t %^]%^"%r" %s %b "%R" "%u" %^' \
---date-format=%d/%b/%Y \
---time-format=%T \
---ignore-panel=REFERRERS --ignore-panel=STATUS --ignore-panel=GEO_LOCATION --ignore-panel=KEYPHRASES \
--o report.json
-```
 
 
 additional module : APScheduler

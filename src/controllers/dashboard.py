@@ -28,15 +28,21 @@ class Dashboard(BaseController):
         # exe.save()
 
         return len(x)
+
+        # a = GoaccessEngine()
+        # p = a.run()
+
+        # return p
     
     @get("add-data")
     def add(self):
-        cek = LogModel.objects.filter(filename="access.log").first()
+        cek = LogModel.objects.filter(filename="/test2/access.log").first()
+        
 
         if cek:
           return "already add"
 
-        a = LogModel(filename="access.log",lastsize=0)
+        a = LogModel(filename="/test2/access.log",lastsize=0)
         a.save()
 
         return "success"  
