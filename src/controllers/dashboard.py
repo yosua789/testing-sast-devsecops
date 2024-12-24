@@ -18,7 +18,8 @@ class Dashboard(BaseController):
     # @auth()
     @get("/")
     def index(self):
-        x = MetaModel.objects.all()
+        x = MetaModel.objects.filter(name="/test/access.log").all()
+        y = MetaModel.objects.filter(name="/test2/access.log").all()
 
         if not x:
             return "empty"
@@ -26,8 +27,8 @@ class Dashboard(BaseController):
 
         # exe = LogModel(filename="access.log")
         # exe.save()
-
-        return len(x)
+        res = {"test":len(x),"test2":len(y)}
+        return res
 
         # a = GoaccessEngine()
         # p = a.run()
