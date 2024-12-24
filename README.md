@@ -25,7 +25,7 @@ example : /home/log/test
       - 50001:8000
 ```
 
-after change the path to mouthing, u can run 
+after change the path to mouthing, u can run, before u run this project make sure to check .env  
 
 ```bash
 sudo docker-compose up --build

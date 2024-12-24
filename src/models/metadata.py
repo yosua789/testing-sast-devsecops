@@ -2,6 +2,10 @@ import mongoengine as me
 from dataclasses import dataclass
 from datetime import datetime
 
+@dataclass
+class InputPath:
+    folder:str
+
 class MetaModel(me.Document):
     meta = {"collection" : "metadata"}
 

@@ -20,6 +20,8 @@ class Dashboard(BaseController):
     def index(self):
         x = MetaModel.objects.filter(name="/test/access.log").all()
         y = MetaModel.objects.filter(name="/test2/access.log").all()
+        z = MetaModel.objects.filter(name="/test3/access.log").all()
+
 
         if not x:
             return "empty"
@@ -27,7 +29,7 @@ class Dashboard(BaseController):
 
         # exe = LogModel(filename="access.log")
         # exe.save()
-        res = {"test":len(x),"test2":len(y)}
+        res = {"test":len(x),"test2":len(y),"test3":len(z)}
         return res
 
         # a = GoaccessEngine()
@@ -35,18 +37,19 @@ class Dashboard(BaseController):
 
         # return p
     
-    @get("add-data")
-    def add(self):
-        cek = LogModel.objects.filter(filename="/test2/access.log").first()
+    @post("add-data")
+    def add(self,data:FromForm[InputPath]):
+        path = data.value.folder
+        path_d = path.lstrip("/")
+
+
+        path_ = os.path.join("/home/log",path_d)
+
+        if not os.path.exists(path_):
+            return "not found"
         
+        exe = LogModel(filename=path,lastsize=0)
+        exe.save()
 
-        if cek:
-          return "already add"
-
-        a = LogModel(filename="/test/access.log",lastsize=0)
-        a.save()
-
-        b = LogModel(filename="/test2/access.log",lastsize=0)
-        b.save()
-        return "success"  
+        return "success"
 
