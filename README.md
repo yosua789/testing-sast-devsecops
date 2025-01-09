@@ -39,3 +39,14 @@ uniq user, req file,not found,os,browesr,reffering site
 
 
 additional module : APScheduler
+
+symlink file log
+
+try restart service
+
+docker compose -f /home/gozilla/project/web_logger/docker-compose-testing.yaml up -d --force-recreate  dashboard
+
+dalam bentuk form
+
+jwt for login
+

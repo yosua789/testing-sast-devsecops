@@ -1,4 +1,4 @@
-import os,subprocess
+import os,subprocess,yaml
 import requests
 from typing import Optional, Any
 
@@ -151,6 +151,99 @@ class GoaccessEngine():
                     return False
 
         return True
+    
+    def CheckHostPath(self,path):
+        endpoint = "http://" + os.getenv("DOCKER_IP") + ":" +os.getenv("DOCKER_MACH_PORT")
+
+        #cek path in host machine
+        endpoint_cek = endpoint + "/service/check_path"
+
+        data_to_send = {
+            "path":path
+        }
+
+        try:
+            res = requests.post(endpoint_cek,json=data_to_send)
+            if res.status_code == 200:
+                return True
+            
+            return False
+
+        except Exception as e:
+            return False
+        
+    def editYaml(self,path_host,path_machine):
+        docker_yaml_loc = "/home/kecilin/docker-compose-testing.yaml"
+        with open(docker_yaml_loc,'r') as config:
+                data = yaml.safe_load(config)
+
+        try:
+            if not data['services']['dashboard']['volumes']:
+                return False,"Volumes not found"
+            
+            data_add = path_host+":"+path_machine
+
+            for i in data['services']['dashboard']['volumes']:
+                if i == data_add:
+                    return False,"Already add volumes"
+
+            data['services']['dashboard']['volumes'].append(data_add)
+
+        except Exception as e:
+            return False,"Error while read yaml"
+        
+
+        try:
+            with open(docker_yaml_loc,'w') as file:
+                yaml.dump(data, file, default_flow_style=False)
+        except:
+            return False
+                
+        return True,"Success Edit Yaml"
+    
+
+    def AddPath(self,path_host,path_machine):
+        
+        cek_host = self.CheckHostPath(path_host)
+
+        if not cek_host:
+            return False,"Path host not found or Error"
+        
+        editStatus,editMsg = self.editYaml(path_host,path_machine)
+
+        if not editStatus:
+            return False,editMsg
+
+        endpoint = "http://" + os.getenv("DOCKER_IP") + ":" +os.getenv("DOCKER_MACH_PORT")
+
+        endpoint_cek = endpoint + "/service/restart-docker"
+
+        docker_filename = os.path.join(os.getenv("DOCKER_FILE_LOCATION"),os.getenv("DOCKER_FILE_NAME"))
+        
+        data_to_send = {
+            "path":docker_filename
+        }
+
+        try:
+            res = requests.post(endpoint_cek,json=data_to_send)
+            if res.status_code == 200:
+                return True
+            
+            return False,"Failed to send"
+
+        except Exception as e:
+            return False,"Failed host service is die"
+
+
+
+
+
+        
+
+        
+
+    
+
 
 
         

@@ -1,18 +1,14 @@
 version: '3'
 
 services:
-  dasboard:
+  dashboard:
     container_name: kecilin_web_logger
     build: 
       context: .
       dockerfile: DockerFile
     volumes:
-      - ./src:/home/kecilin/src
+      - ./:/home/kecilin
       - /home/gozilla/project/web_logger/log:/home/log/test
-      - /home/gozilla/project/web_logger/log_2:/home/log/test2
-      - /home/gozilla/project/web_logger/log_3:/home/log/test3
-
-
     ports:
       - 50001:8000
 

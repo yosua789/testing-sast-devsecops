@@ -1,4 +1,4 @@
-import os
+import os,jwt
 from uuid import uuid4
 from datetime import datetime, timedelta
 from mongoengine.queryset.visitor import Q
@@ -11,6 +11,9 @@ from blacksheep.server.responses import redirect
 from guardpost.asynchronous.authentication import Identity
 from passlib.hash import pbkdf2_sha256 as sha256
 from models import *
+from blacksheep import Application, Response, json
+from blacksheep.cookies import Cookie
+
 # from configuration import send_email
 
 class Auth(BaseController):    
@@ -47,34 +50,44 @@ class Auth(BaseController):
         getUser = UserModel.objects.filter(email=data.value.email).first()
         if not getUser:
             return {'status':400,'message':'Email not found'}
-        
+
+        secret = "dcd10e498fb0c76d1b41f7c748"
 
         if sha256.verify(data.value.password, getUser.password):
-            request.session.update({
-                "id" : str(getUser.id),
-                "name" : getUser.name,
-                "email" : getUser.email,
-                "role" : getUser.role,
-                "login" : True
-            })
+            beJwt = jwt.encode({"id":str(getUser.id),"name":getUser.name,"role":getUser.role}, secret, algorithm="HS256")
+            response = json({'status':200,'message':'Success'})
 
-            return {'status':200,'message':'Success'}
+            response.set_cookie(
+                Cookie(
+                    "Auth_AX",
+                    beJwt,
+                    http_only=True,
+                    path="/",
+                    expires=datetime.now() + timedelta(minutes=60),
+                )
+            )
+
+            return response
+
         
         return {'status':400,'message':'Password not match'}
         
 
-    # # @auth('AuthUser')
-    # @get('/logout')
-    # async def logout(self,user:Identity,request: Request):
-    #     if user :
-    #          request.session.update({
-    #             "id" : '',
-    #             "name" : '',
-    #             "email" : '',
-    #             "role" : '',
-    #             "login" : False
-    #         })
+    # @auth('AuthUser')
+    @get('/logout')
+    async def logout(self,user:Identity,request: Request):
+        response = json({'status':200,'message':'Success logout'})
 
-    #     return redirect("/auth/login")        
+        response.set_cookie(
+                Cookie(
+                    "Auth_AX",
+                    "",
+                    http_only=True,
+                    path="/",
+                    expires=datetime.now() + timedelta(minutes=60),
+                )
+            )
+
+        return response
 
    

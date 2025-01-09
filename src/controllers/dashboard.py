@@ -1,41 +1,43 @@
-import os,subprocess,json,datetime
+import os,subprocess,datetime,requests,jwt
 from uuid import uuid4
 from datetime import datetime, timedelta
 from mongoengine.queryset.visitor import Q
 from .BaseController import BaseController
 from blacksheep.server.controllers import get, post
-from blacksheep.messages import Request
 from blacksheep.server.authorization import auth
-from blacksheep.server.bindings import FromForm, FromQuery
+from blacksheep.server.bindings import FromForm, FromQuery,FromCookie
 from blacksheep.server.responses import redirect
 from guardpost.asynchronous.authentication import Identity
 from passlib.hash import pbkdf2_sha256 as sha256
 from models import *
+from blacksheep.cookies import Cookie
+from blacksheep import json,Response,Request,text
+from typing import Optional
+
 from .core.engine import GoaccessEngine
 # from configuration import send_email
 
+class FromFooCookie(FromCookie[str]):
+    name = "As_X_auth"
+
+class ModeCookie(FromCookie[str]):
+    name = "modea"
+
+
 class Dashboard(BaseController):
-    # @auth()
+    @auth()
     @get("/")
-    def index(self):
-        x = MetaModel.objects.filter(name="/test/access.log").all()
-        y = MetaModel.objects.filter(name="/test2/access.log").all()
-        z = MetaModel.objects.filter(name="/test3/access.log").all()
+    def home(self,req:Request):
+        return "haii"
+    
+    @get("/as")
+    def homes(foo: FromFooCookie) -> Response:
+        return text(
+            f"""
+            Foo: {foo.value}
+            """
+        )
 
-
-        if not x:
-            return "empty"
-
-
-        # exe = LogModel(filename="access.log")
-        # exe.save()
-        res = {"test":len(x),"test2":len(y),"test3":len(z)}
-        return res
-
-        # a = GoaccessEngine()
-        # p = a.run()
-
-        # return p
     
     @post("add-data")
     def add(self,data:FromForm[InputPath]):
@@ -52,4 +54,16 @@ class Dashboard(BaseController):
         exe.save()
 
         return "success"
+
+    @get("test-docker")
+    def docker_testing(self):
+
+        req = requests.get("http://172.17.0.1:5005/dashboard")
+        req = req.json()
+
+        # req = json.load(req)
+        return req['status']
+
+
+
 

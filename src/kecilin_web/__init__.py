@@ -13,6 +13,7 @@ from blacksheep.server.templating import use_templates
 from jinja2 import FileSystemLoader
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from models import *
+
 from controllers.core.engine import GoaccessEngine
 
 # from sdk.engine import *
@@ -23,8 +24,6 @@ else:
     app = Application()
     print('LOAD PRODUCTION')
 
-
-# ke = KecilinOsEngine()
     
 app.serve_files("UI/assets")
 app.use_sessions(os.urandom(32), session_cookie="kecilin_web")
@@ -43,13 +42,28 @@ class AuthHandler(AuthenticationHandler):
         pass
 
     async def authenticate(self, context: Request) -> Optional[Identity]:
-        global redirect_url
-        session = context.session
-        if session.get('login'):
-            context.identity = Identity({"name" : session.get("name"), "email" : session.get("email"), "id" : session.get("id"), "role" : session.get("role")}, "KecilinKloud")
-        else:
+        def iden_none():
             redirect_url = "/auth/login"
             context.identity = None
+
+        global redirect_url
+        try:
+            jwtVal = context.cookies['Auth_AX']
+            secret = "dcd10e498fb0c76d1b41f7c748"
+            if jwtVal:
+                jwtDec = jwt.decode(jwtVal, secret, algorithms=["HS256"])
+                cekId = UserModel.objects.filter(id=jwtDec['id']).first()
+                if not cekId:
+                    iden_none()
+                else:
+                    if cekId.name != jwtDec['name']:
+                        iden_none()
+                    else:
+                        context.identity = Identity({"name" : jwtDec['name'],  "id" : jwtDec['id'], "role" : jwtDec['role']}, "KecilinKloud")
+            else:
+                iden_none()
+        except Exception as e:
+            iden_none()
         
         return context.identity
 
@@ -90,8 +104,8 @@ app.use_authorization().add(Policy("authenticated", AuthenticatedRequirement()))
 app.exceptions_handlers[UnauthorizedError] = handle_unauthorized
 app.exceptions_handlers[404] = handle_404
 
-app.on_start += start_app
-app.on_stop += stop_app
+# app.on_start += start_app
+# app.on_stop += stop_app
 
 
 
