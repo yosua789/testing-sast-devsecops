@@ -1,0 +1,43 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+  
+  <div class="row my-4">
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
+      <div class="card">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+                <a class="btn btn-primary" href="/logfile/add-filelog">Add Log</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-body px-4 pb-2"></div>
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Log name</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">
+                    Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%for i in log%}
+                    <tr><td>{{i.filename}}</td>
+                    <td><a href="/logfile/delete/{{i.id}}" class="btn btn-danger">delete</a></td></tr>
+                {%endfor%}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+{%- endblock -%}

@@ -98,12 +98,18 @@ async def stop_app(application: Application) -> None:
     print("Scheduler Stop")
     scheduler.shutdown(wait=True)
 
+async def add_path(application:Application)-> None:
+    print("Start add path docker yaml")
+    go = GoaccessEngine()
+    go.insertDockerYAMLPath()
+
 
 app.use_authentication().add(AuthHandler())
 app.use_authorization().add(Policy("authenticated", AuthenticatedRequirement())).add(VerifiedPolicy())
 app.exceptions_handlers[UnauthorizedError] = handle_unauthorized
 app.exceptions_handlers[404] = handle_404
 
+app.on_start += add_path
 # app.on_start += start_app
 # app.on_stop += stop_app
 

@@ -1,0 +1,127 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+  <div id="loading" style="display: none;">
+    <p>Loading...</p>
+</div>
+  <div class="row my-4">
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
+      <div class="card">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <a class="btn btn-primary" href="/path/add-path">Add Path</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body px-4 pb-2"></div>
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Host Path</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Machine Path</th>
+
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">
+                    Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%for i in path%}
+                <tr>
+                  <td>{{i.host_path}}</td>
+                  <td>{{i.docker_path}}</td>
+                  <td><button id="deleteBtn" data-id="{{i.id}}" onclick="exeDelete('{{i.id}}')"
+                      class="btn btn-danger">Delete</button></td>
+                </tr>
+                {%endfor%}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+{%- endblock -%}
+{%- block extrajs -%}
+<script>
+  var cek = true;
+  function exeDelete(id) {
+    var endpoint = "/path/delete/" + id
+    var cek = true
+    
+    $.get(endpoint, function(data){
+      if (data.status == 400){
+        cek = false;
+        alert(data.message)
+      }
+    });
+
+    setTimeout(async () => {
+        if (cek) {
+          await cek_dashboard();
+        }
+      }, 2000)
+
+
+  }
+
+  function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  }
+
+
+  async function cek_dashboard() {
+    const url = "/path/";
+    const retry_max = 10;
+    let retry_tmp = 0;
+
+    const loadingElement = $("#loading")
+    loadingElement.fadeIn()
+    while (retry_tmp < retry_max) {
+      console.log(`Checking dashboard... (Attempt ${retry_tmp + 1} of ${retry_max})`);
+      try {
+        const response = await fetch(url, { method: "GET" });
+        if (response.ok) {
+          loadingElement.fadeOut()
+          console.log("Dashboard is ready!");
+          $("#ModalSuccess").modal('show')
+          $("#modal_message_success").text("Success")
+
+          $('#ModalSuccess').on('hidden.bs.modal', function () {
+            window.location = "/path"
+          });
+          return;
+        } else {
+          console.log(`Response not OK (Status: ${response.status}), retrying...`);
+        }
+      } catch (error) {
+        console.log(`Error fetching URL: ${error}, retrying...`);
+      }
+
+      retry_tmp++;
+      await sleep(1000);
+    }
+    loadingElement.fadeOut()
+    console.log("Dashboard is Error");
+    $("#ModalFailed").modal('show')
+    $("#modal_message_failed").text("Failed to connect to the dashboard after maximum retries, please check your service")
+
+    $('#ModalSuccess').on('hidden.bs.modal', function () {
+      window.location = "/path"
+    });
+    // console.error("Failed to connect to the dashboard after maximum retries.");
+    // alert("Dashboard is not ready. Please try again later.");
+  }
+ 
+
+
+
+</script>
+{%- endblock -%}

@@ -2,89 +2,30 @@
 {%- block content -%}
 
 <div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-header p-3 pt-2">
-          <div
-            class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
-            <i class="custom-icon ic-status" style="top:25%; width: 25px; height: 25px;"></i>
-          </div>
-          <div class="text-end pt-1">
-            <p class="text-sm mb-0 text-capitalize">License Status</p>
-            <h4 class="mb-0 text-success" id="status_license">Active</h4>
-          </div>
-        </div>
-        <div class="card-footer p-3 border-0 d-flex justify-content-between">
-          <p class="mb-0 text-dark font-weight-bolder"><span class="text-muted text-sm font-weight-lighter">Start Date
-            </span> <span class="text-sm" id="start_date">Not Set</span></p>
-          <p class="mb-0 text-dark font-weight-bolder"><span class="text-muted text-sm font-weight-lighter">End Date
-            </span><span class="text-sm" id="end_date">Not Set</span></p>
-        </div>
-
-      </div>
-    </div>
-  </div>
+  
   <div class="row my-4">
     <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
       <div class="card">
-        <div class="card-header pb-0">
-          <div class="row">
-            <div class="col-lg-6 col-7">
-              <h6>Compressed CCTV</h6>
-              <p class="text-sm mb-0">
-                <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                <span class="font-weight-bold ms-1">30 done</span> this month
-              </p>
-            </div>
-          </div>
-        </div>
+       
         <div class="card-body px-4 pb-2">
           <div class="table-responsive">
             <table class="table align-items-center mb-0">
               <thead>
                 <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">CCTV Name</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">CCTV ID</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Camera Status
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Logname</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Data</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Created_at
                   </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Camera Mode
-                  </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">
-                    Action</th>
-                </tr>
               </thead>
               <tbody>
-                {% for i in cctv %}
-                <tr>
-                  <td>
-                    <div class="d-flex px-3 py-1">
-                      <h6 class="mb-0 text-sm fw-normal">{{ i.name }}</h6>
-                    </div>
-                  </td>
-                  <td>
-                    <h6 class="mb-0 text-sm fw-normal">{{ i.id }}</h6>
-                  </td>
-                  <td class="">
-                    {% if i.status == 1 %}
-                    <span class="text-sm text-success">Online</span>
-                    {%else %}
-                    <span class="text-sm text-danger">Offline</span>
-                    {%endif%}
-                  </td>
-                  <td class="">
-                    {% if i.enabled == 1 %}
-                    <span class="text-sm text-success">Recording</span>
-                    {%elif i.enabled == 2 %}
-                    <span class="text-sm text-success">Streaming</span>
-                    {%else%}
-                    <span class="text-sm text-danger">Off</span>
-                    {%endif%}
-                  </td>
-                  <td class=" align-middle">
-                    <p>-</p>
-                  </td>
-                  {%endfor%}
+                {%for i in res%}
+                  <tr>
+                    <td>{{i.filename}}</td>
+                    <td>{{i.data | truncate(20)}}</td>
+                    <td>{{i.created_at}}</td>
+                  </tr>
+                {%endfor%}
+              
               </tbody>
             </table>
           </div>
@@ -94,44 +35,5 @@
   </div>
 </div>
 </main>
-
-{%- endblock -%}
-
-{%- block extrajs -%}
-<script>
-  $(document).ready(function () {
-    console.log('haii')
-    var start = $('#start_date')
-    var end = $('#end_date')
-    var status = $('#status_license')
-
-    $.get('/api/v1/license/data', function (res) {
-      console.log(res)
-      if (res.status == 200) {
-        start.text(res.data.start_date)
-        end.text(res.data.end_date)
-      } else if (res.status == 402) {
-        status.text('Expired')
-        status.removeClass('text-success')
-        status.addClass('text-danger')
-        start.text(res.data.start_date)
-        end.text(res.data.end_date)
-      } else if (res.status == 401) {
-        status.text('Not Started')
-        status.removeClass('text-success')
-        status.addClass('text-danger')
-        start.text(res.data.start_date)
-        end.text(res.data.end_date)
-      } else {
-        status.text('Deactive')
-        status.removeClass('text-success')
-        status.addClass('text-danger')
-      }
-    })
-    // start.text('haii')
-
-  })
-</script>
-
 
 {%- endblock -%}

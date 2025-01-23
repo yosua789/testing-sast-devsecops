@@ -1,0 +1,174 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+<div class="container-fluid py-4">
+    <div id="loading" style="display: none;">
+        <p>Loading...</p>
+    </div>
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Add Path</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4 pb-2">
+                    <div>
+                        <div class="mb-3">
+                            <label for="cctvName" class="form-label">Host Path</label>
+                            <input type="text" name="name" class="form-control" id="host" placeholder="CCTV Name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rtspLink" class="form-label">Docker path</label>
+                            <input type="text" name="link" class="form-control" id="docker" placeholder="RTSP Link">
+                            this form always under a /home/log
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary" id="addPath">Add Path</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalVerif" tabindex="-1" aria-labelledby="addSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addSuccessLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                    Reset Service</h6>
+            </div>
+            <div class="modal-body p-5 text-center">
+                <h1>
+                    <i class="far fa-check-circle text-success" style="font-size: 100px;"></i>
+                </h1>
+                If you agree to add a path, the service will stop for a few seconds because the service will be reset
+
+                <div class="d-flex justify-content-center btn-modal gap-2">
+                    <button type="button" class="btn btn-secondary" id="hideModal" data-dismiss="modal">Close</button>
+                    <button type="button" id="verifyPath" class="btn btn-primary ml-3"
+                        data-bs-dismiss="modal">Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+
+{%- endblock -%}
+{%- block extrajs -%}
+<script>
+    var cek = true;
+    $(document).ready(function () {
+        function sleep(milliseconds) {
+            return new Promise(resolve => setTimeout(resolve, milliseconds));
+        }
+
+
+        async function cek_dashboard() {
+            const url = "/path/";
+            const retry_max = 10;
+            let retry_tmp = 0;
+
+            const loadingElement = $("#loading")
+            loadingElement.fadeIn()
+            while (retry_tmp < retry_max) {
+                console.log(`Checking dashboard... (Attempt ${retry_tmp + 1} of ${retry_max})`);
+                try {
+                    const response = await fetch(url, { method: "GET" });
+                    if (response.ok) {
+                        loadingElement.fadeOut()
+                        console.log("Dashboard is ready!");
+                        $("#ModalSuccess").modal('show')
+                        $("#modal_message_success").text("Success")
+
+                        $('#ModalSuccess').on('hidden.bs.modal', function () {
+                            window.location = "/path"
+                        });
+                        return;
+                    } else {
+                        console.log(`Response not OK (Status: ${response.status}), retrying...`);
+                    }
+                } catch (error) {
+                    console.log(`Error fetching URL: ${error}, retrying...`);
+                }
+
+                retry_tmp++;
+                await sleep(1000);
+            }
+            loadingElement.fadeOut()
+            console.log("Dashboard is Error");
+            $("#ModalFailed").modal('show')
+            $("#modal_message_failed").text("Failed to connect to the dashboard after maximum retries, please check your service")
+
+            $('#ModalSuccess').on('hidden.bs.modal', function () {
+                window.location = "/path"
+            });
+            // console.error("Failed to connect to the dashboard after maximum retries.");
+            // alert("Dashboard is not ready. Please try again later.");
+        }
+        var cek_hide = true;
+
+        $("#addPath").click(function () {
+            $("#ModalVerif").modal('show')
+        })
+        $("#hideModal").click(function () {
+            $("#ModalVerif").modal('hide')
+        })
+
+
+        $("#verifyPath").click(async function () {
+            console.log("here")
+            var host = $("#host").val()
+            var docker = $("#docker").val()
+            var postData = new FormData()
+
+            postData.append('host', host)
+            postData.append('docker', docker)
+
+            $.ajax({
+                url: '/path/add-path',
+                type: 'POST',
+                data: postData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    console.log(res)
+                    if (res === undefined) {
+                        $("#addPath").attr('disabled', true);
+
+                    }
+                    else if (res.status != 200) {
+                        $("#ModalFailed").modal('show')
+                        $("#modal_message_failed").text(res.message)
+                        cek = false;
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error response
+                    console.error(error);
+                }
+            });
+
+            // console.log("Path added. Checking dashboard...");
+            // console.log(cek, 'before cekdashboarf')
+            setTimeout(async () => {
+                if (cek) {
+                    await cek_dashboard();
+                }
+            }, 2000)
+
+
+        })
+
+    })
+
+</script>
+{%- endblock -%}

@@ -73,7 +73,7 @@ class Auth(BaseController):
         return {'status':400,'message':'Password not match'}
         
 
-    # @auth('AuthUser')
+    @auth()
     @get('/logout')
     async def logout(self,user:Identity,request: Request):
         response = json({'status':200,'message':'Success logout'})

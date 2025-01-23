@@ -1,4 +1,4 @@
-import os,subprocess,datetime,requests,jwt
+import os,subprocess,datetime,requests,jwt,re
 from uuid import uuid4
 from datetime import datetime, timedelta
 from mongoengine.queryset.visitor import Q
@@ -11,58 +11,56 @@ from guardpost.asynchronous.authentication import Identity
 from passlib.hash import pbkdf2_sha256 as sha256
 from models import *
 from blacksheep.cookies import Cookie
-from blacksheep import json,Response,Request,text
+from blacksheep import json,Response,Request,text,JSONContent
 from typing import Optional
 
 from .core.engine import GoaccessEngine
 # from configuration import send_email
 
-class FromFooCookie(FromCookie[str]):
-    name = "As_X_auth"
-
-class ModeCookie(FromCookie[str]):
-    name = "modea"
 
 
 class Dashboard(BaseController):
-    @auth()
+    # @auth()
     @get("/")
-    def home(self,req:Request):
-        return "haii"
-    
-    @get("/as")
-    def homes(foo: FromFooCookie) -> Response:
-        return text(
-            f"""
-            Foo: {foo.value}
-            """
-        )
+    def index(self,req:Request):
+        pipeline = [
+            {"$lookup": {
+                "from": "log_file",  # The collection name for LogModel
+                "localField": "filelog",  # The field in MetaModel that references LogModel
+                "foreignField": "_id",  # The field in LogModel that we join on
+                "as": "filelog_info"
+            }},
+            {"$unwind": "$filelog_info"},  # Flatten the lookup result
+            {"$sort": {"created_at": -1}},  # Sort by created_at
+            {"$group": {
+                "_id": "$filelog_info.filename",  # Group by filename from LogModel
+                "data": {"$first": "$data"},
+                "created_at": {"$first": "$created_at"}
+            }},
+            {"$project": {
+                "_id": 0,
+                "filename": "$_id",  # Project the filename from the group
+                "data": 1,
+                "created_at": 1
+            }}
+        ]
 
-    
-    @post("add-data")
-    def add(self,data:FromForm[InputPath]):
-        path = data.value.folder
-        path_d = path.lstrip("/")
-
-
-        path_ = os.path.join("/home/log",path_d)
-
-        if not os.path.exists(path_):
-            return "not found"
+        meta = MetaModel.objects.aggregate(*pipeline)
+        meta = list(meta)
         
-        exe = LogModel(filename=path,lastsize=0)
-        exe.save()
+        model = {
+            "res":meta 
+        }
 
-        return "success"
+        return self.view(model=model)
 
     @get("test-docker")
     def docker_testing(self):
 
-        req = requests.get("http://172.17.0.1:5005/dashboard")
-        req = req.json()
-
-        # req = json.load(req)
-        return req['status']
+        go = GoaccessEngine()
+        # a = go.editYaml("/home/gozilla/project/web_logger/log4","/home/log/test4","delete")
+        a = go.run()
+        return a
 
 
 

@@ -49,53 +49,26 @@
             <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="custom-icon ic-status"></i>
             </div>
-            <span class="nav-link-text ms-1">Status</span>
+            <span class="nav-link-text ms-1">Metadata</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white {%if page == 'network'%} active bg-gradient-primary {%endif%}" href="/network">
-            <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="custom-icon ic-network"></i>
-            </div>
-            <span class="nav-link-text ms-1">Network</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white {%if page == 'cctv'%} active bg-gradient-primary {%endif%}" href="/cctv">
-            <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="custom-icon ic-cctv"></i>
-            </div>
-            <span class="nav-link-text ms-1">CCTV</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white {%if page == 'compression'%} active bg-gradient-primary {%endif%}"
-            href="/compression">
+          <a class="nav-link text-white {%if page == 'network'%} active bg-gradient-primary {%endif%}" href="/path">
             <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="custom-icon ic-compression"></i>
             </div>
-            <span class="nav-link-text ms-1">Compression</span>
-          </a>
-        </li>
-        
-        
-        <li class="nav-item">
-          <a class="nav-link text-white  {%if page == 'account-manage'%} active bg-gradient-primary {%endif%}"
-            href="/account-manager">
-            <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="custom-icon ic-account-manager   "></i>
-            </div>
-            <span class="nav-link-text ms-1">Account Manager</span>
+            <span class="nav-link-text ms-1">Path</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white  {%if page == 'profile'%} active bg-gradient-primary {%endif%}" href="/profile">
+          <a class="nav-link text-white {%if page == 'network'%} active bg-gradient-primary {%endif%}" href="/logfile">
             <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="custom-icon ic-account-manager   "></i>
+              <i class="custom-icon ic-snmp"></i>
             </div>
-            <span class="nav-link-text ms-1">My Profile</span>
+            <span class="nav-link-text ms-1">Logfile</span>
           </a>
         </li>
+        
       </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
@@ -145,7 +118,7 @@
                   </div>
                 </a>
                 <ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
-                  <li>
+                  <!-- <li>
                     <a class="dropdown-item border-radius-md" href="/auth/logout">
                       <div class="d-flex py-1">
                         <div class="d-flex flex-column justify-content-center ms-3">
@@ -155,13 +128,13 @@
                         </div>
                       </div>
                     </a>
-                  </li>
+                  </li> -->
                   <li>
-                    <a class="dropdown-item border-radius-md" href="/auth/logout">
+                    <a class="dropdown-item border-radius-md">
                       <div class="d-flex py-1">
                         <div class="d-flex flex-column justify-content-center ms-3">
                           <h6 class="text-sm font-weight-normal mb-1">
-                            Logout
+                            <button onclick="logoutBtn()" class="btn btn-danger">logout</button>
                           </h6>
                         </div>
                       </div>
@@ -174,6 +147,48 @@
         </div>
       </div>
     </nav>
+    <div class="modal fade" id="ModalSuccess" tabindex="-1" aria-labelledby="addSuccessLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6 class="modal-title" id="addSuccessLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                      Success</h6>
+              </div>
+              <div class="modal-body p-5 text-center">
+                  <h1>
+                      <i class="far fa-check-circle text-success" style="font-size: 100px;"></i>
+                  </h1>
+                  <h6 class="text-center mb-3" id="modal_message_success"></h6>
+
+                  <div class="d-flex justify-content-center btn-modal mt-2">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+    <div class="modal fade addFailedModal" id="ModalFailed" tabindex="-1" aria-labelledby="addFailedLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h6 class="modal-title" id="addFailedLabel"><i class="fas fa-exclamation-circle me-2"></i>
+                      Failed</h6>
+              </div>
+              <div class="modal-body p-5 text-center">
+                  <h1>
+                      <i class="far fa-times-circle text-danger" style="font-size: 100px;"></i>
+                  </h1>
+                  
+                  <h6 class="text-center mb-3" id="modal_message_failed"></h6>
+                  
+                  <div class="d-flex justify-content-center btn-modal mt-2">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
     {%- block content -%} {%- endblock -%}
 
     <!-- Setting -->
@@ -197,16 +212,7 @@
           <!-- Sidenav Type -->
           
           <hr class="horizontal dark my-1">
-          <div class="mt-2 d-flex">
-            <div class="form-check form-switch ps-0 ms-auto my-auto">
-              <a href="/setting/config-recording" class="btn btn-primary">Recording Setting</a>
-            </div>
-          </div>
-          <div class="mt-2 d-flex">
-            <div class="form-check form-switch ps-0 ms-auto my-auto">
-              <a href="/setting/config-input" class="btn btn-primary">Input Setting</a>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -220,6 +226,15 @@
     <script src="/js/jquery-3.6.3.min.js"></script>
 
     <script>
+      function logoutBtn(){
+        var url = "/auth/logout"
+        $.get(url,function (response) {
+          if(response.status == 200){
+            window.location = "/auth/login"
+          }
+        })
+      }
+
       var win = navigator.platform.indexOf('Win') > -1;
       if (win && document.querySelector('#sidenav-scrollbar')) {
         var options = {

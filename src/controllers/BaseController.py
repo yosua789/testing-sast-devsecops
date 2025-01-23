@@ -64,41 +64,4 @@ class BaseController(Controller):
 
         return view(self.templates, self.full_view_name(name), final_model, **kwargs)
     
-    def exe_goaccess(self,filename,res_file):
-        goacc = subprocess.run(["which","goaccess"],stdout=subprocess.PIPE,text=True)
-
-        if not goacc.stdout:
-            return False,"Error, Goaccess not found"
-        
-        if not os.path.exists(filename):
-            return False,"Error, filename or respone file not valid, please check your env"
-        
-        command = [
-            goacc.stdout.strip(),
-            filename,  # Path to the log file
-            "--log-format=%h %^[%d:%t %^]%^\"%r\" %s %b \"%R\" \"%u\" %^",
-            "--date-format=%d/%b/%Y",
-            "--time-format=%T",
-            "--ignore-panel=HOSTS",
-            "--ignore-panel=STATUS",
-            "--ignore-panel=GEO_LOCATION",
-            "--ignore-panel=KEYPHRASES",
-            "-o",
-            res_file
-        ]
-
-        try:
-            exe = subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
-        except Exception:
-            return False,"Goaccess failed proccess data"
-        
-        if not os.path.exists(res_file):
-            return False,"Failed open respone fike"
-        
-        return True,"Success"
-
-
-
-
-    
    

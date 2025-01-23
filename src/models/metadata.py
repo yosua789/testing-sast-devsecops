@@ -4,13 +4,20 @@ from datetime import datetime
 
 @dataclass
 class InputPath:
-    folder:str
+    host:str
+    docker:str
 
-class MetaModel(me.Document):
-    meta = {"collection" : "metadata"}
+@dataclass
+class AddLog:
+    filename:str
+    path:str
 
-    name = me.StringField(required=True)
-    data = me.StringField(required=True)
+
+class PathModel(me.Document):
+    meta = {"collection" : "path"}
+
+    host_path = me.StringField(required=True)
+    docker_path = me.StringField(required=True)
     created_at = me.DateTimeField(required=True, default=datetime.now)
 
 class LogModel(me.Document):
@@ -18,6 +25,13 @@ class LogModel(me.Document):
 
     filename = me.StringField(required=True)
     lastsize = me.IntField(required=True,default=0)
+    dateformat = me.StringField(required=True)
+    path = me.ReferenceField(PathModel,required=True)
     created_at = me.DateTimeField(required=True, default=datetime.now)
 
+class MetaModel(me.Document):
+    meta = {"collection" : "metadata"}
     
+    filelog = me.ReferenceField(LogModel,required=True)
+    data = me.StringField(required=True)
+    created_at = me.DateTimeField(required=True, default=datetime.now)
