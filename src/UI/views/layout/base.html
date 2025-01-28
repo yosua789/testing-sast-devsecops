@@ -21,7 +21,10 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <!-- CSS Files -->
   <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.0" rel="stylesheet" />
+  <link id="pagestyle" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.css" rel="stylesheet" />
+
   <link id="pagestyle" href="/css/style.css" rel="stylesheet" />
+  
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
@@ -66,6 +69,14 @@
               <i class="custom-icon ic-snmp"></i>
             </div>
             <span class="nav-link-text ms-1">Logfile</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white {%if page == 'network'%} active bg-gradient-primary {%endif%}" href="/analytic">
+            <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="custom-icon ic-snmp"></i>
+            </div>
+            <span class="nav-link-text ms-1">Analytic</span>
           </a>
         </li>
         
@@ -224,6 +235,8 @@
     <script src="/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="/js/plugins/chartjs.min.js"></script>
     <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    
 
     <script>
       function logoutBtn(){

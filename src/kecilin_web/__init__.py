@@ -110,8 +110,8 @@ app.exceptions_handlers[UnauthorizedError] = handle_unauthorized
 app.exceptions_handlers[404] = handle_404
 
 app.on_start += add_path
-# app.on_start += start_app
-# app.on_stop += stop_app
+app.on_start += start_app
+app.on_stop += stop_app
 
 
 

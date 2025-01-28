@@ -1,0 +1,227 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+
+  <div class="row my-4">
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Requests</h3>
+            <table class="table align-items-center mb-0" id="id-req">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+
+
+              </thead>
+              <tbody>
+                {%for i in requests.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.method}}</td>
+                  <td>{{i.protocol}}</td>
+                  <td>{{i.data}}</td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-5">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Not Found</h3>
+            <table class="table align-items-center mb-0" id="id-req">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+
+
+              </thead>
+              <tbody>
+                {%for i in not_found.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.method}}</td>
+                  <td>{{i.protocol}}</td>
+                  <td>{{i.data}}</td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-5">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Referring Site</h3>
+            <table class="table align-items-center mb-0" id="id-ref">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+
+
+              </thead>
+              <tbody>
+                {%for i in ref_site.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.method}}</td>
+                  <td>{{i.protocol}}</td>
+                  <td>{{i.data}}</td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-5">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Operasion System</h3>
+            <table class="table align-items-center mb-0" id="id-os">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                 
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
+
+
+              </thead>
+              <tbody>
+                {%for i in os.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.data}}</td>
+                  <td><a href="/analytic/log/{{id}}/os/{{i.data}}" class="btn btn-primary">Detail Data</a></td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-5">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Browsers</h3>
+            <table class="table align-items-center mb-0" id="id-os">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
+
+
+              </thead>
+              <tbody>
+                {%for i in browser.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.data}}</td>
+                  <td><a href="/analytic/log/{{id}}/browsers/{{i.data}}" class="btn btn-primary">Detail Data</a></td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-5">
+      <div class="card">
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <h3>Static Requests</h3>
+            <table class="table align-items-center mb-0" id="id-req2">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+              </thead>
+              <tbody>
+                {%for i in static_req.data%}
+                <tr>
+                  <td>{{i.hits.count}}</td>
+                  <td>{{i.visitors.count}}</td>
+                  <td>{{i.method}}</td>
+                  <td>{{i.protocol}}</td>
+                  <td>{{i.data}}</td>
+                </tr>
+                {%endfor%}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+{%- endblock -%}
+{%- block extrajs -%}
+<script>
+  new DataTable('#id-req');
+  new DataTable('#id-req2');
+  new DataTable("#id-not")
+  new DataTable("#id-ref")
+  new DataTable("#id-os")
+
+
+</script>
+{%- endblock -%}

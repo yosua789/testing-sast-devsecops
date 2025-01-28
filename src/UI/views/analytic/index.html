@@ -1,0 +1,40 @@
+{%- extends "layout/base.html" -%}
+{%- block content -%}
+
+<div class="container-fluid py-4">
+  
+  <div class="row my-4">
+    <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
+      <div class="card">
+       
+        <div class="card-body px-4 pb-2">
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Logname</th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Created_at
+                  </th>
+                  <th class="text-secondary text-s font-weight-bolder opacity-7">Action</th>
+                  
+              </thead>
+              <tbody>
+                {%for i in log%}
+                  <tr>
+                    <td>{{i.filename}}</td>
+                    <td>{{i.created_at}}</td>
+                    <td><a href="/analytic/log/{{i.id}}" class="btn btn-primary">View Log</a></td>
+                  </tr>
+                {%endfor%}
+              
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+{%- endblock -%}
