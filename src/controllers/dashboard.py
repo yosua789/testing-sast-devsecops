@@ -20,7 +20,7 @@ from .core.engine import GoaccessEngine
 
 
 class Dashboard(BaseController):
-    # @auth()
+    @auth()
     @get("/")
     def index(self,req:Request):
         pipeline = [
