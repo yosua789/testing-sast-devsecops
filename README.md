@@ -50,3 +50,9 @@ dalam bentuk form
 
 jwt for login
 
+add name service
+breadcrumb
+title spisifik samakan jira
+overall title (general info)
+auth()
+

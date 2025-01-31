@@ -111,3 +111,5 @@
 121.146.41.34 - - [20/Nov/2024:23:57:17 +0000] "\x03\x00\x00*%\xE0\x00\x00\x00\x00\x00Cookie: mstshash=Test" 400 166 "-" "-"
 121.146.41.34 - - [20/Nov/2024:23:57:17 +0000] "\x03\x00\x00*%\xE0\x00\x00\x00\x00\x00Cookie: mstshash=Test" 400 166 "-" "-"
 121.146.41.34 - - [20/Nov/2024:23:57:17 +0000] "\x03\x00\x00*%\xE0\x00\x00\x00\x00\x00Cookie: mstshash=Test" 400 166 "-" "-"
+162.216.150.105 - - [20/Nov/2024:03:06:10 +0000] "GET / HTTP/1.1" 200 3522 "-" "Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com"
+162.216.150.105 - - [20/Nov/2024:03:06:10 +0000] "GET / HTTP/1.1" 200 3522 "-" "Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com"
