@@ -20,6 +20,7 @@ from .core.engine import GoaccessEngine
 
 
 class Analytic(BaseController):
+    @auth()
     @get("/")
     def index(self):
         log = LogModel.objects.all()
@@ -27,6 +28,7 @@ class Analytic(BaseController):
 
         return self.view(model=model)
 
+    @auth()
     @get("/log/{id}")
     def log(self, id: str):
         def formatModel(value, data):
@@ -64,7 +66,8 @@ class Analytic(BaseController):
         }
 
         return self.view(model=model)
-
+    
+    @auth()
     @get("/log-detail/{id}")
     def log_detail(self, id: str, type: str, subtype: str, logid: str = None):
         if not type:
@@ -116,7 +119,8 @@ class Analytic(BaseController):
             return self.view(model=model)
 
         return {"status": 400, "message": "Data not found"}
-
+    
+    @auth()
     @get("/log/filter/{id}")
     def filter(self, id: str, date: str):
         if not date:
@@ -144,7 +148,8 @@ class Analytic(BaseController):
         model = {"data": meta, "id": id}
 
         return self.view(model=model)
-
+    
+    @auth()
     @get("log/filter/{id}/{logid}")
     def filter_date(self, id: str, logid: str):
         def formatModel(value, data):
