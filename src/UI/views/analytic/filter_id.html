@@ -6,26 +6,29 @@
     <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
       <div class="card">
         {%if general%}
-        <div class="form-control">
-          <div class="mb-3">
-            <label for="dateInput" class="form-label">Select a Date</label>
-            <input type="date" id="datelog" class="form-control" id="dateInput">
-          </div>
-          <button onclick="filter_date()" class="btn btn-primary">Submit</button>
-        </div>
+
         <div class="form-label mt-3">
           <h3>Overall Information</h3>
           <h5>Filename : {{filename}}</h5>
-        </div> 
+        </div>
         <table class="table">
-          <tr><td>Start Date : {{general.start_date}}</td><td>End Date : {{general.end_date}}</td></tr>
-          <tr><td>Total Requests : {{general.total_requests}}</td><td>Valid Requests : {{general.valid_requests}}</td></tr>
-          <tr><td>Failed Requests : {{general.failed_requests}}</td><td>Created at : {{create_at}}</td></tr>
+          <tr>
+            <td>Start Date : {{general.start_date}}</td>
+            <td>End Date : {{general.end_date}}</td>
+          </tr>
+          <tr>
+            <td>Total Requests : {{general.total_requests}}</td>
+            <td>Valid Requests : {{general.valid_requests}}</td>
+          </tr>
+          <tr>
+            <td>Failed Requests : {{general.failed_requests}}</td>
+            <td>Created at : {{create_at}}</td>
+          </tr>
         </table>
       </div>
     </div>
   </div>
-  
+
   <div class="row my-4">
     <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
       <div class="card">
@@ -156,7 +159,8 @@
                   <td>{{i.hits.count}}</td>
                   <td>{{i.visitors.count}}</td>
                   <td>{{i.data}}</td>
-                  <td><a href="/analytic/log-detail/{{id}}?type=os&subtype={{i.data}}" class="btn btn-primary">Detail</a></td>
+                  <td><a href="/analytic/log-detail/{{id}}?type=os&subtype={{i.data}}&logid={{logid}}"
+                      class="btn btn-primary">Detail</a></td>
                 </tr>
                 {%endfor%}
 
@@ -172,7 +176,7 @@
         <div class="card-body px-4 pb-2">
           <div class="table-responsive">
             <h3>Browsers</h3>
-            <table class="table align-items-center mb-0" id="id-os">
+            <table class="table align-items-center mb-0" id="id-browser">
               <thead>
                 <tr>
                   <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
@@ -189,7 +193,8 @@
                   <td>{{i.hits.count}}</td>
                   <td>{{i.visitors.count}}</td>
                   <td>{{i.data}}</td>
-                  <td><a href="/analytic/log-detail/{{id}}?type=browsers&subtype={{i.data}}" class="btn btn-primary">Detail</a></td>
+                  <td><a href="/analytic/log-detail/{{id}}?type=browsers&subtype={{i.data}}&logid={{logid}}"
+                      class="btn btn-primary">Detail</a></td>
                 </tr>
                 {%endfor%}
 
@@ -231,7 +236,7 @@
           </div>
         </div>
         {%else%}
-        <h3>Data Empty</h3>
+        <h3>Not Found</h3>
         {%endif%}
       </div>
     </div>
@@ -246,12 +251,11 @@
   new DataTable('#id-req2');
   new DataTable("#id-not")
   new DataTable("#id-ref")
-  new DataTable("#id-not")
   new DataTable("#id-os")
+  new DataTable("#id-browser")
 
-  function filter_date(){
-    var date = $("#datelog").val()
-    window.location.href = "/analytic/log/filter/{{id}}?date="+date
-  }
+  
+
+
 </script>
 {%- endblock -%}

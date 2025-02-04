@@ -26,6 +26,10 @@
                             <label for="cctvName" class="form-label">Log name</label>
                             <input type="text" name="name" class="form-control" id="file" placeholder="Log name">
                         </div>
+                        <div class="mb-3">
+                            <label for="cctvName" class="form-label">Service Name</label>
+                            <input type="text" name="name" class="form-control" id="service" placeholder="Service name">
+                        </div>
                         
                         <div class="d-flex justify-content-end">
                             <button class="btn btn-primary" id="addFile">Add Log</button>
@@ -48,11 +52,13 @@
         $("#addFile").click(function () {
             var file = $("#file").val()
             var path = $("#path").val()
+            var serv = $("#service").val()
 
             var postData = new FormData()
 
             postData.append('filename', file)
             postData.append('path', path)
+            postData.append('service', serv)
             
 
             $.ajax({

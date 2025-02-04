@@ -13,6 +13,7 @@ from models import *
 from blacksheep.cookies import Cookie
 from blacksheep import json,Response,Request,text,JSONContent
 from typing import Optional
+import inspect
 
 from .core.engine import GoaccessEngine
 
@@ -21,8 +22,11 @@ class Logfile(BaseController):
     @get("/")
     def index(self):
         log = LogModel.objects.all()
+        cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
+        
         model = {
-            "log":log
+            "log":log,
+            "breadcrub":[cls_name,func_name]
         }
         return self.view(model=model)
     
@@ -30,8 +34,11 @@ class Logfile(BaseController):
     @get("add-filelog")
     def add_filelog(self):
         log = PathModel.objects.all()
+        cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
+        
         model = {
-            "log":log
+            "log":log,
+            "breadcrub":[cls_name,func_name]
         }
         return self.view(model=model)
     
@@ -40,6 +47,7 @@ class Logfile(BaseController):
     def add_fileexe(self,data:FromForm[AddLog]):
         go = GoaccessEngine()
         log = data.value.filename
+        service = data.value.service
         # return str(data.value.path)
         path = PathModel.objects.filter(id=str(data.value.path)).first()
         
@@ -56,7 +64,12 @@ class Logfile(BaseController):
 
         if cekfile:
             return {"status": 400, "message" : "Data already exists"}
-
+        
+        cekService = LogModel.objects.filter(servicename=service).first()
+        
+        if cekService:
+            return {"status": 400, "message" : "Service name already taken"}
+            
         status,val = go.readLogLine(log)
 
         if not status:
@@ -72,7 +85,7 @@ class Logfile(BaseController):
         if not dateformat:
             return {"status": 400, "message" : "Error convert datetime"}
         
-        exe = LogModel(filename=log,dateformat=dateformat,path=path)
+        exe = LogModel(filename=log,dateformat=dateformat,path=path,servicename=service)
         exe.save()
 
         return {"status": 200, "message" : "Success"}

@@ -9,7 +9,6 @@ services:
     volumes:
     - ./:/home/kecilin
     - /home/gozilla/project/web_logger/log_4:/home/log/test4
-    - /home/gozilla/project/web_logger/log_3:/home/log/test3
     - /home/gozilla/project/web_logger/log:/home/log/test
   mongodb:
     container_name: kecilin_mongo_db

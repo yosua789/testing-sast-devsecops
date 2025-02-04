@@ -11,6 +11,7 @@ class InputPath:
 class AddLog:
     filename:str
     path:str
+    service:str
 
 
 class PathModel(me.Document):
@@ -27,6 +28,8 @@ class LogModel(me.Document):
     lastsize = me.IntField(required=True,default=0)
     dateformat = me.StringField(required=True)
     path = me.ReferenceField(PathModel,required=True)
+    servicename =  me.StringField(required=True)
+    
     created_at = me.DateTimeField(required=True, default=datetime.now)
 
 class MetaModel(me.Document):

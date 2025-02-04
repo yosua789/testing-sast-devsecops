@@ -1,25 +1,22 @@
-version: '3'
-
 services:
   dashboard:
-    container_name: kecilin_web_logger
-    build: 
+    build:
       context: .
       dockerfile: DockerFile
-    volumes:
-      - ./:/home/kecilin
-      - /home/gozilla/project/web_logger/log:/home/log/test
+    container_name: kecilin_web_logger
     ports:
-      - 50001:8000
-
+    - 50001:8000
+    volumes:
+    - ./:/home/kecilin
+    - /home/gozilla/project/web_logger/log:/home/log/test
+    - /home/gozilla/project/web_logger/log_2:/home/log/test2
   mongodb:
     container_name: kecilin_mongo_db
+    environment:
+    - MONGO_INITDB_ROOT_USERNAME=kecilin
+    - MONGO_INITDB_ROOT_PASSWORD=kecilinmongodb123kecilin
+    - MONGO_INITDB_DATABASE=development
     image: mongo:4.4
     ports:
-      - 50002:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=kecilin
-      - MONGO_INITDB_ROOT_PASSWORD=kecilinmongodb123kecilin
-      - MONGO_INITDB_DATABASE=development
-
-
+    - 50002:27017
+version: '3'

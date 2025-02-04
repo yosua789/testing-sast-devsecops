@@ -64,4 +64,16 @@ class BaseController(Controller):
 
         return view(self.templates, self.full_view_name(name), final_model, **kwargs)
     
+    def format_breadcrub(self,cls_name,func_name):
+        cls_name = cls_name.title()
+        func_name = func_name.replace("_"," ").title()
+        
+        func_name = func_name.replace(" ","-")
+        
+        return cls_name,func_name
+        
+        
+    
+    
+    
    

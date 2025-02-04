@@ -13,6 +13,7 @@ from models import *
 from blacksheep.cookies import Cookie
 from blacksheep import json,Response,Request,text,JSONContent
 from typing import Optional
+import inspect
 
 from .core.engine import GoaccessEngine
 
@@ -21,13 +22,23 @@ class Path(BaseController):
     @get("/")
     def index(self):
         path = PathModel.objects.all()
+        cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
+        
         model = {
-            "path" : path
+            "path" : path,
+            "breadcrub":[cls_name,func_name],
+            
         }
         return self.view(model=model)
+    
     @auth()
     @get("/add-path")
     def add_path(self):
+        cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
+        model={
+            "breadcrub":[cls_name,func_name],
+            
+        }
         return self.view()
     
     @auth()

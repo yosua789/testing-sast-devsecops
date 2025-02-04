@@ -13,6 +13,7 @@ from models import *
 from blacksheep.cookies import Cookie
 from blacksheep import json,Response,Request,text,JSONContent
 from typing import Optional
+import inspect
 
 from .core.engine import GoaccessEngine
 # from configuration import send_email
@@ -48,8 +49,12 @@ class Dashboard(BaseController):
         meta = MetaModel.objects.aggregate(*pipeline)
         meta = list(meta)
         
+        cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
+        
+        
         model = {
-            "res":meta 
+            "res":meta,
+            "breadcrub":[cls_name,func_name],
         }
 
         return self.view(model=model)
