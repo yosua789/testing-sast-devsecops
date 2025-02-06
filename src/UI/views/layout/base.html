@@ -16,7 +16,6 @@
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <!-- CSS Files -->
@@ -77,6 +76,15 @@
               <i class="custom-icon ic-snmp"></i>
             </div>
             <span class="nav-link-text ms-1">Analytic</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {%if page == 'network'%} active bg-gradient-primary {%endif%}" href="/account-manager">
+            <div class="ic-element text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="custom-icon ic-snmp"></i>
+            </div>
+            <span class="nav-link-text ms-1">Account Manager</span>
           </a>
         </li>
         
@@ -234,6 +242,8 @@
     <script src="/js/plugins/chartjs.min.js"></script>
     <script src="/js/jquery-3.6.3.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="/js/fontawesome/all.min.js"></script>
+
     
 
     <script>

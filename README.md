@@ -56,3 +56,11 @@ title spisifik samakan jira
 overall title (general info)
 auth()
 
+feb 4
+pagination not in data table but manual
+
+user managemen(admin,viewer)
+1. path 
+2. api
+
+

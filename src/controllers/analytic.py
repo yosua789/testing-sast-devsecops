@@ -73,6 +73,7 @@ class Analytic(BaseController):
                 "id": id,
                 "filename": datas.filelog.filename,
                 "create_at":datas.created_at,
+                "service": datas.filelog.servicename,
                 "breadcrub":[cls_name,func_name]
 
             }
@@ -213,6 +214,7 @@ class Analytic(BaseController):
                 "filename": datas.filelog.filename,
                 "create_at":datas.created_at,
                 "logid": logid,
+                "service": datas.filelog.servicename,
                 "breadcrub":[cls_name,func_name]
             }
         else:

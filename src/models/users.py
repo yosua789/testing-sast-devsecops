@@ -24,15 +24,15 @@ class usersForm:
 
 
 @dataclass
+class usersUpdate:
+    name:str
+    role:str
+    password:str=None
+
+
+@dataclass
 class LoginUser:
     email:str
     password:str
  
-
-@dataclass
-class UserUpdate:
-    email:str
-    username:str
-    current_password:str=''
-    new_password:str=''
-    confirm_password:str=''
+# 
