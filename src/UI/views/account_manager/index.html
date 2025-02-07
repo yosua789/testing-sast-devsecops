@@ -4,9 +4,11 @@
 <!-- End Navbar -->
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end">
+        {%if iden_role == "admin"%}
         <a class="btn btn-primary mb-0 d-flex align-items-center" href="/account-manager/add-account"><i
                 class="fas fa-plus me-2"></i>
             Add Account</a>
+        {%endif%}
     </div>
     <div class="row my-4">
         <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
@@ -51,12 +53,15 @@
                                         <span class="text-sm text-success">{{user.role}}</span>
                                     </td>
                                     <td class="d-flex justify-content-center align-middle">
+                                        {%if iden_role == "admin"%}
                                         <a href="/account-manager/delete/{{user.email }}"
                                             class="btn bg-danger-2 rounded text-white py-1 px-2 mx-2"><i
                                                 class="fas fa-trash"></i></a> |
                                         <a href="/account-manager/update/{{user.email }}" class="btn bg-info rounded text-white py-1 px-2 mx-2"><i
                                                 class="fas fa-edit"></i></a>
-
+                                        {%else%}
+                                        dont have access
+                                        {%endif%}
                                     </td>
                                 </tr>
                                 {%endfor%}

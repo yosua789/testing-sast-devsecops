@@ -6,9 +6,10 @@ from blacksheep.server.templating import view
 from datetime import datetime
 from passlib.hash import pbkdf2_sha256 as sha256
 from dotenv import load_dotenv
-import os,subprocess
+import os, subprocess
 
 import requests
+
 
 class TemplatingNotConfiguredException(Exception):
     def __init__(self) -> None:
@@ -16,6 +17,7 @@ class TemplatingNotConfiguredException(Exception):
             "Server side HTML templating is not configured. Configure templating using "
             "the function `use_templates` from blacksheep.server.templating."
         )
+
 
 class Struct:
     def __init__(self, **entries):
@@ -29,23 +31,28 @@ class BaseController(Controller):
     session: dict = {}
 
     async def on_request(self, request: Request):
-        if 'login' in request.session:
-            if request.session['login']:
+        if "login" in request.session:
+            if request.session["login"]:
+
                 def get_copy():
                     now = datetime.now()
                     return "{} {}".format(now.year, "Kecilin ID")
 
-                self.model = {"session" : request.session, "copy" : get_copy}
+                self.model = {"session": request.session, "copy": get_copy}
                 self.session = request.session
 
     @classmethod
     def route(cls):
         cls_name = cls.class_name()
         if cls_name.lower() != "index":
-            return join_fragments(cls_name.lower().replace('_','-'))
+            return join_fragments(cls_name.lower().replace("_", "-"))
 
     def view(
-        self, name: Optional[str] = None, model: Optional[Any] = None, **kwargs
+        self,
+        name: Optional[str] = None,
+        model: Optional[Any] = None,
+        iden:Optional[Any]=None,
+        **kwargs,
     ) -> Response:
 
         final_model = {}
@@ -55,25 +62,22 @@ class BaseController(Controller):
 
         if self.templates is None:
             raise TemplatingNotConfiguredException()
-        
+
         if self.model:
-            final_model = { **self.model } 
+            final_model = {**self.model}
 
         if model:
             final_model = {**model, **final_model}
 
+        if iden is not None:
+            final_model = {"iden":iden.claims.get("name"),"iden_role":iden.claims.get("role"),**final_model}
+
         return view(self.templates, self.full_view_name(name), final_model, **kwargs)
-    
-    def format_breadcrub(self,cls_name,func_name):
+
+    def format_breadcrub(self, cls_name, func_name):
         cls_name = cls_name.title()
-        func_name = func_name.replace("_"," ").title()
-        
-        func_name = func_name.replace(" ","-")
-        
-        return cls_name,func_name
-        
-        
-    
-    
-    
-   
+        func_name = func_name.replace("_", " ").title()
+
+        func_name = func_name.replace(" ", "-")
+
+        return cls_name, func_name

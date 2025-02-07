@@ -14,6 +14,9 @@ from jinja2 import FileSystemLoader
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from models import *
 
+from blacksheep.exceptions import HTTPException
+
+
 from controllers.core.engine import GoaccessEngine
 
 # from sdk.engine import *
@@ -75,10 +78,24 @@ class AuthChecker(Requirement):
         if identity is not None:
             context.succeed(self)
         
+class AdminChecker(Requirement):
+     def handle(self, context: AuthorizationContext):
+        
+        identity = context.identity
+
+        if identity is not None and identity.claims.get("role").lower() == "admin":
+            context.succeed(self)
+        else:
+            raise HTTPException(403,"Forbidden")
+        
 
 class VerifiedPolicy(Policy):
     def __init__(self):
-        super().__init__("AuthUser", AuthChecker())
+        super().__init__("", AuthChecker())
+        
+class adminPolicy(Policy):
+    def __init__(self):
+        super().__init__("admin", AdminChecker())
 
 
 async def handle_unauthorized(app: Any, request: Request, http_exception: UnauthorizedError) -> Response:
@@ -87,6 +104,9 @@ async def handle_unauthorized(app: Any, request: Request, http_exception: Unauth
 
 async def handle_404(app: Any, request: Request, http_exception: 404) -> Response:
     return Response(404, content=JSONContent({"status": 404, "message" : "404 not found"}))
+
+async def handle_403(app: Any, request: Request, http_exception: 404) -> Response:
+    return Response(403, content=JSONContent({"status": 403, "message" : "Forbidden"}))
 
 async def start_app(application: Application) -> None:
     print("Scheduler read log is start")
@@ -106,8 +126,11 @@ async def add_path(application:Application)-> None:
 
 app.use_authentication().add(AuthHandler())
 app.use_authorization().add(Policy("authenticated", AuthenticatedRequirement())).add(VerifiedPolicy())
+app.use_authorization().add(Policy("authenticated", AuthenticatedRequirement())).add(adminPolicy())
+
 app.exceptions_handlers[UnauthorizedError] = handle_unauthorized
 app.exceptions_handlers[404] = handle_404
+app.exceptions_handlers[403] = handle_403
 
 app.on_start += add_path
 app.on_start += start_app

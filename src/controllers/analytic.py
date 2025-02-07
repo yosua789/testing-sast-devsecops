@@ -21,9 +21,9 @@ from .core.engine import GoaccessEngine
 
 
 class Analytic(BaseController):
-    # @auth()
+    @auth()
     @get("/")
-    def index(self):
+    def index(self,iden:Identity):
         cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
         # return model
         log = LogModel.objects.all()
@@ -31,11 +31,11 @@ class Analytic(BaseController):
                  "breadcrub":[cls_name,func_name]
                  }
 
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
 
     @auth()
     @get("/log/{id}")
-    def log(self, id: str):
+    def log(self, id: str,iden:Identity):
         def formatModel(value, data):
             try:
                 return data[value]
@@ -82,12 +82,12 @@ class Analytic(BaseController):
                 "breadcrub":[cls_name,func_name]
             }
 
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
         
     
     @auth()
     @get("/log-detail/{id}")
-    def log_detail(self, id: str, type: str, subtype: str, logid: str = None):
+    def log_detail(self, id: str, type: str, subtype: str,iden:Identity, logid: str = None,):
         if not type:
             return {"status": 400, "message": "Type not found"}
 
@@ -141,13 +141,13 @@ class Analytic(BaseController):
 
                 # return model
 
-                return self.view(model=model)
+                return self.view(model=model,iden=iden)
 
         return {"status": 400, "message": "Data not found"}
     
     @auth()
     @get("/log/filter/{id}")
-    def filter_date(self, id: str, date: str):
+    def filter_date(self, id: str, date: str,iden:Identity):
         if not date:
             return {"status": 400, "message": "Date not valid"}
 
@@ -173,11 +173,11 @@ class Analytic(BaseController):
                     
         model = {"data": meta, "id": id,"breadcrub":[cls_name,func_name]}
 
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
     
     @auth()
     @get("log/filter/{id}/{logid}")
-    def filter_id(self, id: str, logid: str):
+    def filter_id(self, id: str, logid: str,iden:Identity):
         def formatModel(value, data):
             try:
                 return data[value]
@@ -222,4 +222,4 @@ class Analytic(BaseController):
                 "breadcrub":[cls_name,func_name]
                 
             }
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)

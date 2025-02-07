@@ -23,7 +23,8 @@ from .core.engine import GoaccessEngine
 class Dashboard(BaseController):
     @auth()
     @get("/")
-    def index(self,req:Request):
+    def index(self,req:Request,iden:Identity):
+        # return iden.claims.get("name")
         pipeline = [
             {"$lookup": {
                 "from": "log_file",  # The collection name for LogModel
@@ -57,7 +58,7 @@ class Dashboard(BaseController):
             "breadcrub":[cls_name,func_name],
         }
 
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
 
     @get("test-docker")
     def docker_testing(self):

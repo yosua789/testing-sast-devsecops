@@ -20,7 +20,8 @@ from .core.engine import GoaccessEngine
 class Logfile(BaseController):
     @auth()
     @get("/")
-    def index(self):
+    def index(self,iden:Identity):
+        
         log = LogModel.objects.all()
         cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
         
@@ -28,11 +29,11 @@ class Logfile(BaseController):
             "log":log,
             "breadcrub":[cls_name,func_name]
         }
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
     
-    @auth()
+    @auth("admin")
     @get("add-filelog")
-    def add_filelog(self):
+    def add_filelog(self,iden:Identity):
         log = PathModel.objects.all()
         cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
         
@@ -40,9 +41,9 @@ class Logfile(BaseController):
             "log":log,
             "breadcrub":[cls_name,func_name]
         }
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
     
-    @auth()
+    @auth("admin")
     @post("add-filelog")
     def add_fileexe(self,data:FromForm[AddLog]):
         go = GoaccessEngine()
@@ -90,7 +91,7 @@ class Logfile(BaseController):
 
         return {"status": 200, "message" : "Success"}
 
-    @auth()
+    @auth("admin")
     @get("/delete/{id}")
     def delete(self,id:str):
         try:

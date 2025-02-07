@@ -17,9 +17,9 @@ from blacksheep.cookies import Cookie
 # from configuration import send_email
 
 class Auth(BaseController):    
-    @get('/')
-    async def index(self):
-        return os.getenv("MONGO_URI")
+    # @get('/')
+    # async def index(self):
+    #     return red
 
     # @get('/add-manual')
     # async def test(self):
@@ -36,7 +36,7 @@ class Auth(BaseController):
         cekUser = UserModel.objects.filter(email = "admin@app.com").first()
 
         if not cekUser:
-            exe = UserModel(name='admin',email='admin@app.com',password=sha256.encrypt('admin123'),role='Admin')
+            exe = UserModel(name='admin',email='admin@app.com',password=sha256.encrypt('admin123'),role='admin')
             exe.save()
 
         if user:

@@ -20,7 +20,7 @@ from .core.engine import GoaccessEngine
 class Path(BaseController):
     @auth()
     @get("/")
-    def index(self):
+    def index(self,iden:Identity):
         path = PathModel.objects.all()
         cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
         
@@ -29,19 +29,19 @@ class Path(BaseController):
             "breadcrub":[cls_name,func_name],
             
         }
-        return self.view(model=model)
+        return self.view(model=model,iden=iden)
     
-    @auth()
+    @auth("admin")
     @get("/add-path")
-    def add_path(self):
+    def add_path(self,iden:Identity):
         cls_name,func_name = self.format_breadcrub(self.__class__.__name__,inspect.currentframe().f_code.co_name)
         model={
             "breadcrub":[cls_name,func_name],
             
         }
-        return self.view()
+        return self.view(model=model,iden=iden)
     
-    @auth()
+    @auth("admin")
     @post("add-path")
     def add(self,context:Request,data:FromForm[InputPath]):
         go = GoaccessEngine()
@@ -64,7 +64,7 @@ class Path(BaseController):
         if not status:
             return {"status": 400, "message" : msg}
         
-    @auth()
+    @auth("admin")
     @get("/delete/{id}")
     def delete_path(self,context:Request,id:str):
         go = GoaccessEngine()
