@@ -113,23 +113,29 @@ class GoaccessEngine():
         
         return False
     
-    def run(self):
-        cekLog = LogModel.objects.all()
+    def getIgnore(self):
         ignore = os.getenv("IGNORE") if os.getenv("IGNORE") else False
-
-        if not cekLog:
-            print("LOG is empty")
-            return False
-
+        
         try:
             ignore = ignore.lower()
             if ignore == "true":
                 ignore = True
             else:
                 ignore = False
-
+            
+            return ignore
         except Exception as e:
-            pass
+            return False
+        
+    
+    def run(self):
+        cekLog = LogModel.objects.all()
+
+        if not cekLog:
+            print("LOG is empty")
+            return False
+
+        ignore = self.getIgnore()
         
         for log in cekLog:
             # file = log.filename.lstrip("/")
@@ -330,32 +336,3 @@ class GoaccessEngine():
 
         return False
         
-
-    
-
-
-
-
-
-
-
-
-        
-
-        
-
-    
-
-
-
-        
-
- 
-    
-    
-    
-
-
-
-
-
