@@ -73,10 +73,9 @@ class GoaccessEngine():
         respone_file,respone_path = self.filenameRespone(filename)
 
         if not os.path.exists(respone_path):
-            os.mkdir(respone_path)
+            os.makedirs(respone_path,exist_ok=True)
 
         dateformat = "--date-format="+date
-
 
         command = [
             goacc,
