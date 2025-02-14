@@ -5,5 +5,6 @@ from .path import *
 from .log import *
 from .analytic import *
 from .accountManager import *
+from .error import *
 
 from .core.engine import *

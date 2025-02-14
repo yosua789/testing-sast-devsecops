@@ -103,10 +103,12 @@ async def handle_unauthorized(app: Any, request: Request, http_exception: Unauth
     return redirect(redirect_url)
 
 async def handle_404(app: Any, request: Request, http_exception: 404) -> Response:
-    return Response(404, content=JSONContent({"status": 404, "message" : "404 not found"}))
+    return redirect("/error/404")
+
 
 async def handle_403(app: Any, request: Request, http_exception: 404) -> Response:
-    return Response(403, content=JSONContent({"status": 403, "message" : "Forbidden"}))
+    return redirect("/error/403")
+    
 
 async def start_app(application: Application) -> None:
     print("Scheduler read log is start")

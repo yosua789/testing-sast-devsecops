@@ -6,11 +6,12 @@
     <div class="col-lg-9 col-md-12 mb-md-0 mb-4">
       <div class="card">
         {%if general%}
-
+        
         <div class="form-label mt-3">
           <h3>Overall Information</h3>
           <h5>Filename : {{filename}}</h5>
           <h5>Service Name : {{service}}</h5>
+
         </div>
         <table class="table">
           <tr>
@@ -48,215 +49,276 @@
 
 
               </thead>
-              <tbody>
-                {%for i in requests.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.method}}</td>
-                  <td>{{i.protocol}}</td>
-                  <td>{{i.data}}</td>
-                </tr>
-                {%endfor%}
 
-              </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
+  </div>
 
-    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
-      <div class="card">
-        <div class="card-body px-4 pb-2">
-          <div class="table-responsive">
-            <h3>Not Found Urls (404)</h3>
-            <table class="table align-items-center mb-0" id="id-not">
-              <thead>
-                <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
-                  </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+  <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
+    <div class="card">
+      <div class="card-body px-4 pb-2">
+        <div class="table-responsive">
+          <h3>Operating Systems</h3>
+          <table class="table align-items-center mb-0" id="id-os">
+            <thead>
+              <tr>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                </th>
+
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
 
 
-              </thead>
-              <tbody>
-                {%for i in not_found.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.method}}</td>
-                  <td>{{i.protocol}}</td>
-                  <td>{{i.data}}</td>
-                </tr>
-                {%endfor%}
-
-              </tbody>
-            </table>
-          </div>
+            </thead>
+            
+          </table>
         </div>
-      </div>
-    </div>
-
-    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
-      <div class="card">
-        <div class="card-body px-4 pb-2">
-          <div class="table-responsive">
-            <h3>Referring Sites</h3>
-            <table class="table align-items-center mb-0" id="id-ref">
-              <thead>
-                <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
-                  </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
-
-
-              </thead>
-              <tbody>
-                {%for i in ref_site.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.method}}</td>
-                  <td>{{i.protocol}}</td>
-                  <td>{{i.data}}</td>
-                </tr>
-                {%endfor%}
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
-      <div class="card">
-        <div class="card-body px-4 pb-2">
-          <div class="table-responsive">
-            <h3>Operating Systems</h3>
-            <table class="table align-items-center mb-0" id="id-os">
-              <thead>
-                <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
-                  </th>
-
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
-
-
-              </thead>
-              <tbody>
-                {%for i in os.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.data}}</td>
-                  <td><a href="/analytic/log-detail/{{id}}?type=os&subtype={{i.data}}&logid={{logid}}"
-                      class="btn btn-primary">Detail</a></td>
-                </tr>
-                {%endfor%}
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
-      <div class="card">
-        <div class="card-body px-4 pb-2">
-          <div class="table-responsive">
-            <h3>Browsers</h3>
-            <table class="table align-items-center mb-0" id="id-browser">
-              <thead>
-                <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
-                  </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
-
-
-              </thead>
-              <tbody>
-                {%for i in browser.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.data}}</td>
-                  <td><a href="/analytic/log-detail/{{id}}?type=browsers&subtype={{i.data}}&logid={{logid}}"
-                      class="btn btn-primary">Detail</a></td>
-                </tr>
-                {%endfor%}
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
-      <div class="card">
-        <div class="card-body px-4 pb-2">
-          <div class="table-responsive">
-            <h3>Static Requests</h3>
-            <table class="table align-items-center mb-0" id="id-req2">
-              <thead>
-                <tr>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
-                  </th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
-                  <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
-              </thead>
-              <tbody>
-                {%for i in static_req.data%}
-                <tr>
-                  <td>{{i.hits.count}}</td>
-                  <td>{{i.visitors.count}}</td>
-                  <td>{{i.method}}</td>
-                  <td>{{i.protocol}}</td>
-                  <td>{{i.data}}</td>
-                </tr>
-                {%endfor%}
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {%else%}
-        <h3>Not Found</h3>
-        {%endif%}
       </div>
     </div>
   </div>
+
+  <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
+    <div class="card">
+      <div class="card-body px-4 pb-2">
+        <div class="table-responsive">
+          <h3>Not Found Urls (404)</h3>
+          <table class="table align-items-center mb-0" id="id-not">
+            <thead>
+              <tr>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                </th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+
+
+            </thead>
+            
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
+    <div class="card">
+      <div class="card-body px-4 pb-2">
+        <div class="table-responsive">
+          <h3>Referring Sites</h3>
+          <table class="table align-items-center mb-0" id="id-ref">
+            <thead>
+              <tr>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                </th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+
+
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
+    <div class="card">
+      <div class="card-body px-4 pb-2">
+        <div class="table-responsive">
+          <h3>Browsers</h3>
+          <table class="table align-items-center mb-0" id="id-browser">
+            <thead>
+              <tr>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                </th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Detail</th>
+
+
+            </thead>
+            
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9 col-md-12 mb-md-0 mb-4 mt-3">
+    <div class="card">
+      <div class="card-body px-4 pb-2">
+        <div class="table-responsive">
+          <h3>Static Requests</h3>
+          <table class="table align-items-center mb-0" id="id-static">
+            <thead>
+              <tr>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Hits</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7 ps-2">Visitor
+                </th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Method</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Protocol</th>
+                <th class="text-secondary text-s font-weight-bolder opacity-7">Data</th>
+            </thead>
+           
+          </table>
+        </div>
+      </div>
+
+
+
+    {%else%}
+    <h3>Data Empty</h3>
+    {%endif%}
+  </div>
+</div>
+</div>
 </div>
 </main>
 
 {%- endblock -%}
 {%- block extrajs -%}
 <script>
-  new DataTable('#id-req');
-  new DataTable('#id-req2');
-  new DataTable("#id-not")
-  new DataTable("#id-ref")
-  new DataTable("#id-os")
-  new DataTable("#id-browser")
+  $(document).ready(function () {
+    var id = "{{id}}";
+    var logid = "{{logid}}"
+  // Initialize Requested Files Table
+    $('#id-req').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=requests&logid="+logid,
+            "data": function (d) {
+                console.log(d);  // Debug request data
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "method" },
+            { "data": "protocol" },
+            { "data": "data" }
+        ]
+    });
 
-  
+    $('#id-ref').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=referring_sites&logid="+logid,
+            "data": function (d) {
+                console.log(d);  // Debug request data
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "method" },
+            { "data": "protocol" },
+            { "data": "data" }
+        ]
+    });
 
+    $('#id-static').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=static_requests&logid="+logid,
+            "data": function (d) {
+                console.log(d);  // Debug request data
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "method" },
+            { "data": "protocol" },
+            { "data": "data" }
+        ]
+    });
+
+    // Initialize Not Found (404) Table
+    $('#id-not').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=not_found&logid="+logid,
+            "data": function (d) {
+                console.log(d);  // Debug request data
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "method" },
+            { "data": "protocol" },
+            { "data": "data" }
+        ]
+    });
+
+    // Initialize Operating Systems Table
+    $('#id-os').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=os&logid="+logid,
+            "data": function (d) {
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "data" },
+            {
+                "data": null,
+                "render": function (data, type, row) {
+                    return `<a href="/analytic/log-detail/`+id+`?type=os&subtype=${row.data}" class="btn btn-primary">Detail</a>`;
+                }
+            }
+        ]
+    });
+
+    $('#id-browser').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "/analytic/sub_log_detail/" + id + "?type=browsers&logid="+logid,
+            "data": function (d) {
+                return d;
+            }
+        },
+        "columns": [
+            { "data": "hits" },
+            { "data": "visitor" },
+            { "data": "data" },
+            {
+                "data": null,
+                "render": function (data, type, row) {
+                  return `<a href="/analytic/log-detail/`+id+`?type=browsers&subtype=${row.data}" class="btn btn-primary">Detail</a>`;
+
+                }
+            }
+        ]
+    });
+
+    // Remove duplicate `new DataTable()` calls
+});
+
+// Function to filter by date
+function filter_date() {
+    var date = $("#datelog").val();
+    window.location.href = "/analytic/log/filter/{{id}}?date=" + date;
+}
 
 </script>
 {%- endblock -%}
