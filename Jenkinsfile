@@ -3,12 +3,11 @@ pipeline {
 
   options {
     timestamps()
-    ansiColor('xterm')
   }
 
   environment {
     SONAR_SCANNER = 'sonar-scanner'
-    SONAR_SERVER  = 'sonarqube-server' 
+    SONAR_SERVER  = 'sonarqube-server'
     SEMGREP_IMAGE = 'semgrep/semgrep:latest'
     SEMGREP_SARIF = 'semgrep.sarif'
     SEMGREP_JUNIT = 'semgrep-junit.xml'
@@ -31,13 +30,11 @@ pipeline {
             def sonarArgs = [
               "-Dsonar.projectKey=kecilin:testing-sast-devsecops",
               "-Dsonar.projectName=testing-sast-devsecops",
-
               "-Dsonar.sources=src",
               "-Dsonar.inclusions=src/**",
               "-Dsonar.exclusions=**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml",
               "-Dsonar.coverage.exclusions=**/*.test.*,**/test/**,**/tests/**"
             ]
-
             if (isPR) {
               sonarArgs += [
                 "-Dsonar.pullrequest.key=${env.CHANGE_ID}",
@@ -48,7 +45,6 @@ pipeline {
             } else {
               sonarArgs += ["-Dsonar.branch.name=${env.BRANCH_NAME ?: 'main'}"]
             }
-
             withEnv(["PATH+SONAR=${tool env.SONAR_SCANNER}/bin"]) {
               sh "sonar-scanner ${sonarArgs.join(' ')}"
             }
@@ -71,7 +67,6 @@ pipeline {
         script {
           def rules = ["p/ci", "p/owasp-top-ten", "p/docker"]
           def cfgArg = rules.collect { "--config ${it}" }.join(' ')
-
           sh """
             docker pull ${env.SEMGREP_IMAGE}
             docker run --rm -v "$PWD:/src" -w /src \\
