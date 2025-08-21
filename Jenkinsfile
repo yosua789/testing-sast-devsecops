@@ -7,7 +7,7 @@ pipeline {
 
   environment {
     SONAR_SCANNER = 'sonar-scanner'
-    SONAR_SERVER  = 'sonarqube-server'
+    SONAR_SERVER  = 'sonarqube-token'
     SEMGREP_IMAGE = 'semgrep/semgrep:latest'
     SEMGREP_SARIF = 'semgrep.sarif'
     SEMGREP_JUNIT = 'semgrep-junit.xml'
