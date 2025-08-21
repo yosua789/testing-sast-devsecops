@@ -4,14 +4,16 @@ pipeline {
   options { timestamps() }
 
   environment {
-    DOCKER_HOST = 'tcp://dind:2375'
+    // Arahkan docker CLI di Jenkins ke daemon DinD
+    DOCKER_HOST   = 'tcp://dind:2375'
+
+    // SonarQube di dalam network (service name + port internal)
+    SONAR_HOST_URL = 'http://sonarqube:9000'
 
     // Semgrep
     SEMGREP_IMAGE = 'semgrep/semgrep:latest'
     SEMGREP_SARIF = 'semgrep.sarif'
     SEMGREP_JUNIT = 'semgrep-junit.xml'
-
-    SONAR_HOST_URL = 'http://sonarqube:9000'
   }
 
   stages {
@@ -24,7 +26,7 @@ pipeline {
 
     stage('SonarQube Scan (Docker CLI + token)') {
       steps {
-        withCredentials([string(credentialsId: 'sonar-qube', variable: 'SONAR_TOKEN')]) {
+        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
           sh """
             docker pull sonarsource/sonar-scanner-cli
             docker run --rm --network ci-net -v "$PWD:/usr/src" sonarsource/sonar-scanner-cli \\
@@ -40,6 +42,9 @@ pipeline {
         }
       }
     }
+
+    // (Opsional) Tambahkan Quality Gate kalau nanti pakai konfigurasi "SonarQube servers" di Jenkins
+    // stage('Quality Gate') { steps { ... waitForQualityGate ... } }
 
     stage('Semgrep SAST') {
       steps {
@@ -62,6 +67,7 @@ pipeline {
       }
       post {
         always {
+          // Plugin yang dibutuhkan: Warnings NG & JUnit
           recordIssues(enabledForFailure: true, tools: [sarif(pattern: "${SEMGREP_SARIF}", id: 'Semgrep')])
           junit allowEmptyResults: true, testResults: "${SEMGREP_JUNIT}"
           archiveArtifacts artifacts: "${SEMGREP_SARIF}, ${SEMGREP_JUNIT}", fingerprint: true, onlyIfSuccessful: false
