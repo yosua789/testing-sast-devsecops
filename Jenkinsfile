@@ -1,28 +1,23 @@
 pipeline {
   agent any
-  options { timestamps()
-  disableResume()
+  options {
+    timestamps()
+    disableResume()
   }
-
 
   parameters {
     string(
       name: 'SONAR_HOST_URL',
-      defaultValue: 'http://172.18.0.4:9000',   // ganti kalau IP/port Sonar beda
+      defaultValue: 'http://172.18.0.4:9000',
       description: 'URL SonarQube yang bisa diakses dari kontainer DinD'
     )
   }
 
   environment {
-    // Semua "docker run/pull" dijalankan oleh DinD
-    DOCKER_HOST    = 'tcp://dind:2375'
-
-    // Semgrep
-    SEMGREP_IMAGE  = 'semgrep/semgrep:latest'
-    SEMGREP_SARIF  = 'semgrep.sarif'
-    SEMGREP_JUNIT  = 'semgrep-junit.xml'
-
-    // Identitas project SonarQube (HARUS sudah ada di Sonar)
+    DOCKER_HOST        = 'tcp://dind:2375'
+    SEMGREP_IMAGE      = 'semgrep/semgrep:latest'
+    SEMGREP_SARIF      = 'semgrep.sarif'
+    SEMGREP_JUNIT      = 'semgrep-junit.xml'
     SONAR_PROJECT_KEY  = 'kecilin:testing-sast-devsecops'
     SONAR_PROJECT_NAME = 'testing-sast-devsecops'
   }
@@ -39,8 +34,7 @@ pipeline {
       steps {
         withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
           sh 'echo DOCKER_HOST=$DOCKER_HOST'
-          sh 'docker version'   // harus tampil Client + Server (Server = DinD)
-          // Cek Sonar reachable dari kontainer (tanpa --network, karena lewat DinD)
+          sh 'docker version'
           sh 'docker run --rm curlimages/curl -s -I "$SONAR_HOST_URL" | head -n1 || true'
           sh 'docker run --rm curlimages/curl -s "$SONAR_HOST_URL/api/system/status" || true'
         }
@@ -51,10 +45,8 @@ pipeline {
       steps {
         withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
           withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-            // NOTE: pakai Groovy single-quoted block, variabel shell tetap diexpand karena kita pakai "double quotes" di dalamnya
             sh '''
               docker pull sonarsource/sonar-scanner-cli
-              # Repo kamu tidak punya folder src/, jadi sumber = root (.)
               docker run --rm -v "$WORKSPACE:/usr/src" \
                 sonarsource/sonar-scanner-cli \
                   -Dsonar.host.url="$SONAR_HOST_URL" \
@@ -87,7 +79,6 @@ pipeline {
       }
       post {
         always {
-          // Perlu plugin Warnings NG & JUnit di Jenkins
           recordIssues(enabledForFailure: true, tools: [sarif(pattern: "${SEMGREP_SARIF}", id: 'Semgrep')])
           junit allowEmptyResults: true, testResults: "${SEMGREP_JUNIT}"
           archiveArtifacts artifacts: "${SEMGREP_SARIF}, ${SEMGREP_JUNIT}", fingerprint: true, onlyIfSuccessful: false
