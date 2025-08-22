@@ -18,8 +18,8 @@ pipeline {
     SEMGREP_IMAGE      = 'semgrep/semgrep:latest'
     SEMGREP_SARIF      = 'semgrep.sarif'
     SEMGREP_JUNIT      = 'semgrep-junit.xml'
-    SONAR_PROJECT_KEY  = 'kecilin:testing-sast-devsecops'
-    SONAR_PROJECT_NAME = 'testing-sast-devsecops'
+    SONAR_PROJECT_KEY  = 'demo-SAST'
+    SONAR_PROJECT_NAME = 'demo-SAST'
   }
 
   stages {
@@ -34,7 +34,7 @@ pipeline {
       steps {
         withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
           sh 'echo DOCKER_HOST=$DOCKER_HOST'
-          sh 'docker version'
+          sh 'docker -H tcp://dind:2375 version'
           sh 'docker run --rm curlimages/curl -s -I "$SONAR_HOST_URL" | head -n1 || true'
           sh 'docker run --rm curlimages/curl -s "$SONAR_HOST_URL/api/system/status" || true'
         }
