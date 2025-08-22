@@ -1,19 +1,15 @@
 pipeline {
   agent any
-
   options { timestamps() }
 
   environment {
-    // Arahkan docker CLI di Jenkins ke daemon DinD
-    DOCKER_HOST   = 'tcp://dind:2375'
+    DOCKER_HOST    = 'tcp://dind:2375'
 
-    // SonarQube di dalam network (service name + port internal)
     SONAR_HOST_URL = 'http://sonarqube:9000'
 
-    // Semgrep
-    SEMGREP_IMAGE = 'semgrep/semgrep:latest'
-    SEMGREP_SARIF = 'semgrep.sarif'
-    SEMGREP_JUNIT = 'semgrep-junit.xml'
+    SEMGREP_IMAGE  = 'semgrep/semgrep:latest'
+    SEMGREP_SARIF  = 'semgrep.sarif'
+    SEMGREP_JUNIT  = 'semgrep-junit.xml'
   }
 
   stages {
@@ -24,50 +20,52 @@ pipeline {
       }
     }
 
+    stage('Docker Daemon Check') {
+      steps {
+        sh 'echo DOCKER_HOST=$DOCKER_HOST'
+        sh 'docker version'
+      }
+    }
+
     stage('SonarQube Scan (Docker CLI + token)') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-          sh """
+          sh '''
+            export SONAR_LOGIN="$SONAR_TOKEN"
             docker pull sonarsource/sonar-scanner-cli
-            docker run --rm --network ci-net -v "$PWD:/usr/src" sonarsource/sonar-scanner-cli \\
-              -Dsonar.host.url=${SONAR_HOST_URL} \\
-              -Dsonar.login=${SONAR_TOKEN} \\
-              -Dsonar.projectKey=kecilin:testing-sast-devsecops \\
-              -Dsonar.projectName=testing-sast-devsecops \\
-              -Dsonar.sources=src \\
-              -Dsonar.inclusions=src/** \\
-              -Dsonar.exclusions=**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml \\
-              -Dsonar.coverage.exclusions=**/*.test.*,**/test/**,**/tests/**
-          """
+            docker run --rm --network jenkins -v "$PWD:/usr/src" \
+              -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_LOGIN="$SONAR_LOGIN" \
+              sonarsource/sonar-scanner-cli \
+                -Dsonar.host.url="$SONAR_HOST_URL" \
+                -Dsonar.login="$SONAR_LOGIN" \
+                -Dsonar.projectKey=kecilin:testing-sast-devsecops \
+                -Dsonar.projectName=testing-sast-devsecops \
+                -Dsonar.sources=src \
+                -Dsonar.inclusions=src/** \
+                -Dsonar.exclusions=**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml \
+                -Dsonar.coverage.exclusions=**/*.test.*,**/test/**,**/tests/**
+          '''
         }
       }
     }
 
-    // (Opsional) Tambahkan Quality Gate kalau nanti pakai konfigurasi "SonarQube servers" di Jenkins
-    // stage('Quality Gate') { steps { ... waitForQualityGate ... } }
-
     stage('Semgrep SAST') {
       steps {
-        script {
-          def rules = ["p/ci", "p/owasp-top-ten", "p/docker"]
-          def cfgArg = rules.collect { "--config ${it}" }.join(' ')
-          sh """
-            docker pull ${SEMGREP_IMAGE}
-            docker run --rm --network ci-net -v "$PWD:/src" -w /src \\
-              ${SEMGREP_IMAGE} semgrep scan \\
-              ${cfgArg} \\
-              --include 'src/**' \\
-              --include 'DockerFile' \\
-              --exclude 'log/**' --exclude 'log4/**' --exclude 'log_3/**' \\
-              --sarif -o ${SEMGREP_SARIF} \\
-              --junit-xml --junit-xml-file ${SEMGREP_JUNIT} \\
-              --severity error --error
-          """
-        }
+        sh """
+          docker pull ${SEMGREP_IMAGE}
+          docker run --rm --network jenkins -v "$PWD:/src" -w /src \
+            ${SEMGREP_IMAGE} semgrep scan \
+            --config p/ci --config p/owasp-top-ten --config p/docker \
+            --include 'src/**' \
+            --include 'DockerFile' \
+            --exclude 'log/**' --exclude 'log4/**' --exclude 'log_3/**' \
+            --sarif -o ${SEMGREP_SARIF} \
+            --junit-xml --junit-xml-file ${SEMGREP_JUNIT} \
+            --severity error --error
+        """
       }
       post {
         always {
-          // Plugin yang dibutuhkan: Warnings NG & JUnit
           recordIssues(enabledForFailure: true, tools: [sarif(pattern: "${SEMGREP_SARIF}", id: 'Semgrep')])
           junit allowEmptyResults: true, testResults: "${SEMGREP_JUNIT}"
           archiveArtifacts artifacts: "${SEMGREP_SARIF}, ${SEMGREP_JUNIT}", fingerprint: true, onlyIfSuccessful: false
