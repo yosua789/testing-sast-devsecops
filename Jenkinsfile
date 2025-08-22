@@ -4,7 +4,7 @@ pipeline {
 
   environment {
     DOCKER_HOST    = 'tcp://dind:2375'
-    SONAR_HOST_URL = 'http://host.docker.internal:9010'
+    SONAR_HOST_URL = 'http://sonarqube:9000'   // pakai nama ini, akan di-resolve via --add-host
     SEMGREP_IMAGE  = 'semgrep/semgrep:latest'
     SEMGREP_SARIF  = 'semgrep.sarif'
     SEMGREP_JUNIT  = 'semgrep-junit.xml'
@@ -18,21 +18,15 @@ pipeline {
       }
     }
 
-    stage('Docker Daemon Check') {
-      steps {
-        sh 'echo DOCKER_HOST=$DOCKER_HOST'
-        sh 'docker version'
-        sh 'docker run --rm curlimages/curl -s -I http://host.docker.internal:9010 | head -n1'
-      }
-    }
-
     stage('SonarQube Scan (Docker CLI + token)') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
           sh '''
             export SONAR_LOGIN="$SONAR_TOKEN"
             docker pull sonarsource/sonar-scanner-cli
-            docker run --rm -v "$PWD:/usr/src" \
+            docker run --rm \
+              --add-host sonarqube:172.18.0.4 \  # <— injek DNS untuk sonarqube
+              -v "$PWD:/usr/src" \
               -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_LOGIN="$SONAR_LOGIN" \
               sonarsource/sonar-scanner-cli \
                 -Dsonar.host.url="$SONAR_HOST_URL" \
@@ -52,7 +46,8 @@ pipeline {
       steps {
         sh """
           docker pull ${SEMGREP_IMAGE}
-          docker run --rm -v "$PWD:/src" -w /src \
+          docker run --rm \
+            -v "$PWD:/src" -w /src \
             ${SEMGREP_IMAGE} semgrep scan \
             --config p/ci --config p/owasp-top-ten --config p/docker \
             --include 'src/**' \
