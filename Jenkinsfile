@@ -2,17 +2,16 @@ pipeline {
   agent any
   options { timestamps() }
 
-  // Gampang ganti target Sonar tanpa ubah file
   parameters {
     string(
       name: 'SONAR_HOST_URL',
       defaultValue: 'http://172.18.0.4:9000',
-      description: 'URL SonarQube yang dapat diakses dari kontainer DinD (contoh: http://<IP-Sonar>:9000 atau http://<HOST-IP>:9010)'
+      description: 'URL SonarQube yang bisa diakses dari kontainer DinD (cth: http://<IP-Sonar>:9000 atau http://<HOST-IP>:9010)'
     )
   }
 
   environment {
-    // Kontainer dijalankan oleh DinD
+    // Kontainer job jalan via DinD
     DOCKER_HOST    = 'tcp://dind:2375'
 
     // Semgrep
@@ -20,7 +19,7 @@ pipeline {
     SEMGREP_SARIF  = 'semgrep.sarif'
     SEMGREP_JUNIT  = 'semgrep-junit.xml'
 
-    // Identitas project di SonarQube
+    // Identitas project SonarQube
     SONAR_PROJECT_KEY  = 'kecilin:testing-sast-devsecops'
     SONAR_PROJECT_NAME = 'testing-sast-devsecops'
   }
@@ -35,55 +34,61 @@ pipeline {
 
     stage('Docker & Sonar connectivity') {
       steps {
-        sh 'echo DOCKER_HOST=$DOCKER_HOST'
-        sh 'docker version'   // harus tampil Client + Server
-        sh 'docker run --rm curlimages/curl -s -I "${params.SONAR_HOST_URL}" | head -n1 || true'
-        sh 'docker run --rm curlimages/curl -s "${params.SONAR_HOST_URL}/api/system/status" || true'
+        withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
+          sh 'echo DOCKER_HOST=$DOCKER_HOST'
+          sh 'docker version'   // harus tampil Client + Server (Server = DinD)
+          sh 'docker run --rm curlimages/curl -s -I "$SONAR_HOST_URL" | head -n1 || true'
+          sh 'docker run --rm curlimages/curl -s "$SONAR_HOST_URL/api/system/status" || true'
+        }
       }
     }
 
-    // Auto-create project kalau belum ada (butuh permission "Create Projects")
     stage('Ensure Sonar Project Exists') {
       steps {
-        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-          sh '''
-            set -e
-            echo "Cek project ${SONAR_PROJECT_KEY}…"
-            FOUND=$(docker run --rm curlimages/curl -sf -u "$SONAR_TOKEN:" \
-                    "${SONAR_HOST_URL:-${params.SONAR_HOST_URL}}/api/projects/search?projects=${SONAR_PROJECT_KEY}" \
-                    | grep -F "\"key\":\"${SONAR_PROJECT_KEY}\"" || true)
+        withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
+          withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+            sh '''
+              set -e
+              echo "Cek project ${SONAR_PROJECT_KEY}…"
+              FOUND=$(docker run --rm curlimages/curl -sf -u "$SONAR_TOKEN:" \
+                      "$SONAR_HOST_URL/api/projects/search?projects=${SONAR_PROJECT_KEY}" \
+                      | grep -F "\"key\":\"${SONAR_PROJECT_KEY}\"" || true)
 
-            if [ -z "$FOUND" ]; then
-              echo "Project belum ada. Mencoba membuat…"
-              docker run --rm curlimages/curl -sf -u "$SONAR_TOKEN:" -X POST \
-                "${SONAR_HOST_URL:-${params.SONAR_HOST_URL}}/api/projects/create?project=${SONAR_PROJECT_KEY}&name=${SONAR_PROJECT_NAME}" \
-              || { echo "GAGAL membuat project. Pastikan token punya permission 'Create Projects'."; exit 1; }
-              echo "Project dibuat."
-            else
-              echo "Project sudah ada."
-            fi
-          '''
+              if [ -z "$FOUND" ]; then
+                echo "Project belum ada. Mencoba membuat…"
+                docker run --rm curlimages/curl -sf -u "$SONAR_TOKEN:" -X POST \
+                  "$SONAR_HOST_URL/api/projects/create?project=${SONAR_PROJECT_KEY}&name=${SONAR_PROJECT_NAME}" \
+                || { echo "GAGAL membuat project. Pastikan token punya permission 'Create Projects'."; exit 1; }
+                echo "Project dibuat."
+              else
+                echo "Project sudah ada."
+              fi
+            '''
+          }
         }
       }
     }
 
     stage('SonarQube Scan') {
       steps {
-        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-          sh '''
-            docker pull sonarsource/sonar-scanner-cli
-            # Repo kamu tidak punya folder src/, jadi sumber = root (.)
-            docker run --rm -v "$WORKSPACE:/usr/src" \
-              sonarsource/sonar-scanner-cli \
-                -Dsonar.host.url="${SONAR_HOST_URL:-${params.SONAR_HOST_URL}}" \
-                -Dsonar.token="$SONAR_TOKEN" \
-                -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-                -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
-                -Dsonar.sources=. \
-                -Dsonar.inclusions="**/*" \
-                -Dsonar.exclusions="**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml" \
-                -Dsonar.coverage.exclusions="**/*.test.*,**/test/**,**/tests**"
-          '''
+        withEnv(["SONAR_HOST_URL=${params.SONAR_HOST_URL}"]) {
+          withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+            // NOTE: pakai single-quoted block supaya token tidak di-interpolate Groovy
+            sh '''
+              docker pull sonarsource/sonar-scanner-cli
+              # Repo tidak punya folder src/, jadi sumber = root (.)
+              docker run --rm -v "$WORKSPACE:/usr/src" \
+                sonarsource/sonar-scanner-cli \
+                  -Dsonar.host.url="$SONAR_HOST_URL" \
+                  -Dsonar.token="$SONAR_TOKEN" \
+                  -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+                  -Dsonar.projectName="$SONAR_PROJECT_NAME" \
+                  -Dsonar.sources=. \
+                  -Dsonar.inclusions="**/*" \
+                  -Dsonar.exclusions="**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml" \
+                  -Dsonar.coverage.exclusions="**/*.test.*,**/test/**,**/tests**"
+            '''
+          }
         }
       }
     }
