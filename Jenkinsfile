@@ -1,8 +1,10 @@
 pipeline {
   agent any
-  options { timestamps() }
+  options { timestamps()
+  disableResume()
+  }
 
-  // Biar gampang kalau URL Sonar berubah
+
   parameters {
     string(
       name: 'SONAR_HOST_URL',
