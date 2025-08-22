@@ -2,7 +2,7 @@ pipeline {
   agent any
   options { timestamps() }
 
-  // Biar gampang kalau IP Sonar berubah-ubah
+  // Biar gampang ganti IP/port Sonar kalau berubah
   parameters {
     string(name: 'SONAR_HOST_URL', defaultValue: 'http://172.18.0.4:9000',
            description: 'URL SonarQube yang bisa diakses dari kontainer DinD (contoh: http://<IP-Sonar>:9000 atau http://<HOST-IP>:9010)')
@@ -37,10 +37,10 @@ pipeline {
     stage('SonarQube Scan (CLI + token)') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-          // pakai single-quoted shell block (hindari Groovy interpolation warning)
           sh '''
             docker pull sonarsource/sonar-scanner-cli
-            # Mount workspace Jenkins ke dalam kontainer scanner via DinD
+
+            # Sumber pakai root repo (karena tidak ada folder src/)
             docker run --rm -v "$WORKSPACE:/usr/src" \
               sonarsource/sonar-scanner-cli \
                 -Dsonar.host.url="${SONAR_HOST_URL:-''' + "${params.SONAR_HOST_URL}" + '''}" \
@@ -64,6 +64,7 @@ pipeline {
             ${SEMGREP_IMAGE} semgrep scan \
             --config p/ci --config p/owasp-top-ten --config p/docker \
             --exclude 'log/**' --exclude 'log4/**' --exclude 'log_3/**' \
+            --exclude '**/node_modules/**' --exclude '**/dist/**' --exclude '**/build/**' \
             --sarif -o ${SEMGREP_SARIF} \
             --junit-xml --junit-xml-file ${SEMGREP_JUNIT} \
             --severity error --error
@@ -71,7 +72,7 @@ pipeline {
       }
       post {
         always {
-          // Butuh plugin Warnings NG & JUnit
+          // Perlu plugin Warnings NG & JUnit
           recordIssues(enabledForFailure: true, tools: [sarif(pattern: "${SEMGREP_SARIF}", id: 'Semgrep')])
           junit allowEmptyResults: true, testResults: "${SEMGREP_JUNIT}"
           archiveArtifacts artifacts: "${SEMGREP_SARIF}, ${SEMGREP_JUNIT}", fingerprint: true, onlyIfSuccessful: false
