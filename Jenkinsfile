@@ -2,12 +2,15 @@ pipeline {
   agent any
   options { timestamps() }
 
-  environment {
-    // Kontainer jalan via DinD
-    DOCKER_HOST    = 'tcp://dind:2375'
+  // Biar gampang kalau IP Sonar berubah-ubah
+  parameters {
+    string(name: 'SONAR_HOST_URL', defaultValue: 'http://172.18.0.4:9000',
+           description: 'URL SonarQube yang bisa diakses dari kontainer DinD (contoh: http://<IP-Sonar>:9000 atau http://<HOST-IP>:9010)')
+  }
 
-    // Akses SonarQube via IP (network 'jenkins' milik daemon host)
-    SONAR_HOST_URL = 'http://172.18.0.4:9000'
+  environment {
+    // Kontainer job dijalankan oleh DinD
+    DOCKER_HOST    = 'tcp://dind:2375'
 
     // Semgrep
     SEMGREP_IMAGE  = 'semgrep/semgrep:latest'
@@ -27,31 +30,25 @@ pipeline {
       steps {
         sh 'echo DOCKER_HOST=$DOCKER_HOST'
         sh 'docker version'   // harus tampil Client + Server (Server = DinD)
+        sh 'docker run --rm curlimages/curl -s -I "${params.SONAR_HOST_URL}" | head -n1 || true'
       }
     }
 
-    stage('Connectivity: SonarQube from DinD') {
-      steps {
-        // Uji koneksi ke Sonar dari kontainer yang DIJALANKAN oleh DinD
-        sh 'docker run --rm curlimages/curl -s "$SONAR_HOST_URL/api/system/status"'
-      }
-    }
-
-    stage('SonarQube Scan (Docker CLI + token)') {
+    stage('SonarQube Scan (CLI + token)') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+          // pakai single-quoted shell block (hindari Groovy interpolation warning)
           sh '''
-            export SONAR_LOGIN="$SONAR_TOKEN"
             docker pull sonarsource/sonar-scanner-cli
-            docker run --rm -v "$PWD:/usr/src" \
-              -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_LOGIN="$SONAR_LOGIN" \
+            # Mount workspace Jenkins ke dalam kontainer scanner via DinD
+            docker run --rm -v "$WORKSPACE:/usr/src" \
               sonarsource/sonar-scanner-cli \
-                -Dsonar.host.url="$SONAR_HOST_URL" \
-                -Dsonar.login="$SONAR_LOGIN" \
+                -Dsonar.host.url="${SONAR_HOST_URL:-''' + "${params.SONAR_HOST_URL}" + '''}" \
+                -Dsonar.token="$SONAR_TOKEN" \
                 -Dsonar.projectKey=kecilin:testing-sast-devsecops \
                 -Dsonar.projectName=testing-sast-devsecops \
-                -Dsonar.sources=src \
-                -Dsonar.inclusions=src/** \
+                -Dsonar.sources=. \
+                -Dsonar.inclusions="**/*" \
                 -Dsonar.exclusions="**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml" \
                 -Dsonar.coverage.exclusions="**/*.test.*,**/test/**,**/tests**"
           '''
@@ -63,11 +60,9 @@ pipeline {
       steps {
         sh """
           docker pull ${SEMGREP_IMAGE}
-          docker run --rm -v "$PWD:/src" -w /src \
+          docker run --rm -v "$WORKSPACE:/src" -w /src \
             ${SEMGREP_IMAGE} semgrep scan \
             --config p/ci --config p/owasp-top-ten --config p/docker \
-            --include 'src/**' \
-            --include 'DockerFile' \
             --exclude 'log/**' --exclude 'log4/**' --exclude 'log_3/**' \
             --sarif -o ${SEMGREP_SARIF} \
             --junit-xml --junit-xml-file ${SEMGREP_JUNIT} \
@@ -76,7 +71,7 @@ pipeline {
       }
       post {
         always {
-          // Perlu plugin Warnings NG & JUnit
+          // Butuh plugin Warnings NG & JUnit
           recordIssues(enabledForFailure: true, tools: [sarif(pattern: "${SEMGREP_SARIF}", id: 'Semgrep')])
           junit allowEmptyResults: true, testResults: "${SEMGREP_JUNIT}"
           archiveArtifacts artifacts: "${SEMGREP_SARIF}, ${SEMGREP_JUNIT}", fingerprint: true, onlyIfSuccessful: false
