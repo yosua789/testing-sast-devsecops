@@ -4,9 +4,7 @@ pipeline {
 
   environment {
     DOCKER_HOST    = 'tcp://dind:2375'
-
-    SONAR_HOST_URL = 'http://sonarqube:9000'
-
+    SONAR_HOST_URL = 'http://host.docker.internal:9010'
     SEMGREP_IMAGE  = 'semgrep/semgrep:latest'
     SEMGREP_SARIF  = 'semgrep.sarif'
     SEMGREP_JUNIT  = 'semgrep-junit.xml'
@@ -24,6 +22,7 @@ pipeline {
       steps {
         sh 'echo DOCKER_HOST=$DOCKER_HOST'
         sh 'docker version'
+        sh 'docker run --rm curlimages/curl -s -I http://host.docker.internal:9010 | head -n1'
       }
     }
 
@@ -33,7 +32,7 @@ pipeline {
           sh '''
             export SONAR_LOGIN="$SONAR_TOKEN"
             docker pull sonarsource/sonar-scanner-cli
-            docker run --rm --network jenkins -v "$PWD:/usr/src" \
+            docker run --rm -v "$PWD:/usr/src" \
               -e SONAR_HOST_URL="$SONAR_HOST_URL" -e SONAR_LOGIN="$SONAR_LOGIN" \
               sonarsource/sonar-scanner-cli \
                 -Dsonar.host.url="$SONAR_HOST_URL" \
@@ -43,7 +42,7 @@ pipeline {
                 -Dsonar.sources=src \
                 -Dsonar.inclusions=src/** \
                 -Dsonar.exclusions=**/log/**,**/log4/**,**/log_3/**,**/*.test.*,**/node_modules/**,**/dist/**,**/build/**,docker-compose.yaml \
-                -Dsonar.coverage.exclusions=**/*.test.*,**/test/**,**/tests/**
+                -Dsonar.coverage.exclusions=**/*.test.*,**/test/**,**/tests**
           '''
         }
       }
@@ -53,7 +52,7 @@ pipeline {
       steps {
         sh """
           docker pull ${SEMGREP_IMAGE}
-          docker run --rm --network jenkins -v "$PWD:/src" -w /src \
+          docker run --rm -v "$PWD:/src" -w /src \
             ${SEMGREP_IMAGE} semgrep scan \
             --config p/ci --config p/owasp-top-ten --config p/docker \
             --include 'src/**' \
@@ -76,6 +75,6 @@ pipeline {
 
   post {
     always  { echo "Build result: ${currentBuild.currentResult}" }
-    failure { echo "Cek temuan SonarQube & Semgrep di halaman build." }
+    failure { echo "Scanning Done" }
   }
 }
